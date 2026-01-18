@@ -1,18 +1,15 @@
 import { ThemeProvider } from '@/components/common/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
-import { AuthProvider } from '@/providers/AuthProvider'
+// import { AuthProvider } from '@/providers/AuthProvider'
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Be_Vietnam_Pro } from 'next/font/google'
 import './globals.css'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ['vietnamese'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-be-vietnam-pro',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -26,8 +23,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="vi" suppressHydrationWarning>
+      <body 
+        suppressHydrationWarning 
+        className={`${beVietnamPro.className} antialiased`}
+      >
         {/* <AuthProvider> */}
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
             {children}
@@ -38,4 +38,3 @@ export default function RootLayout({
     </html>
   )
 }
-

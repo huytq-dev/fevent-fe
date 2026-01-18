@@ -24,7 +24,7 @@ export default function StatusView({
   title,
   message,
   actionLabel = 'Trang chủ',
-  actionLink = ROUTES.DASHBOARD,
+  actionLink = ROUTES.HOME,
   showBackButton = true,
   children,
 }: StatusViewProps) {
