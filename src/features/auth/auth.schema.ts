@@ -1,90 +1,73 @@
-import { z } from 'zod'
+import * as z from 'zod'
 
-// =========================================
-// 1. LOGIN
-// =========================================
-export const getLoginSchema = () =>
-  z.object({
-    email: z
-      .string({ message: 'Email là bắt buộc' })
-      .email({ message: 'Email không hợp lệ' })
-      .toLowerCase()
-      .trim(),
-    password: z
-      .string({ message: 'Mật khẩu là bắt buộc' })
-      .min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
-      .max(50, { message: 'Mật khẩu quá dài' }),
-    rememberMe: z.boolean().default(false).optional(),
-  })
+// --- LOGIN SCHEMA ---
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "Vui lòng nhập email" })
+    .email({ message: "Email không đúng định dạng" }),
+  password: z
+    .string()
+    .min(1, { message: "Vui lòng nhập mật khẩu" }),
+  remember: z.boolean().optional(),
+})
 
-export type LoginInput = z.infer<ReturnType<typeof getLoginSchema>>
-export type LoginRequest = LoginInput
+export type LoginFormValues = z.infer<typeof loginSchema>
 
-// =========================================
-// 2. REGISTER
-// =========================================
-export const getRegisterSchema = () =>
-  z
-    .object({
-      name: z
-        .string({ message: 'Tên là bắt buộc' })
-        .min(2, { message: 'Tên phải có ít nhất 2 ký tự' })
-        .max(50)
-        .trim(),
-      email: z
-        .string({ message: 'Email là bắt buộc' })
-        .email({ message: 'Email không hợp lệ' })
-        .toLowerCase()
-        .trim(),
-      password: z
-        .string({ message: 'Mật khẩu là bắt buộc' })
-        .min(8, { message: 'Mật khẩu phải có ít nhất 8 ký tự' })
-        .regex(/[A-Z]/, {
-          message: 'Mật khẩu cần ít nhất 1 chữ hoa',
-        })
-        .regex(/[0-9]/, { message: 'Mật khẩu cần ít nhất 1 số' })
-        .regex(/[^A-Za-z0-9]/, {
-          message: 'Mật khẩu cần ít nhất 1 ký tự đặc biệt',
-        }),
-      confirmPassword: z.string({
-        message: 'Vui lòng xác nhận mật khẩu',
-      }),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: 'Mật khẩu xác nhận không khớp',
-      path: ['confirmPassword'],
-    })
+// Login input type for API calls
+export interface LoginInput {
+  email: string
+  password: string
+  rememberMe?: boolean
+}
 
-export type RegisterInput = z.infer<ReturnType<typeof getRegisterSchema>>
+// --- REGISTER SCHEMA ---
+export const registerSchema = z.object({
+  name: z.string().min(2, "Họ tên phải có ít nhất 2 ký tự"),
+  username: z.string()
+    .min(3, "Username phải có ít nhất 3 ký tự")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username chỉ chứa chữ, số và gạch dưới"),
+  
+  schoolName: z.string().min(5, "Vui lòng nhập tên trường"), 
+  
+  studentId: z.string()
+    .min(1, "Vui lòng nhập MSSV")
+    .regex(/^[a-zA-Z0-9]+$/, "MSSV không chứa ký tự đặc biệt"), 
 
-// =========================================
-// 3. PASSWORD FLOWS
-// =========================================
-export const getForgotPasswordSchema = () =>
-  z.object({
-    email: z
-      .string()
-      .min(1, 'Email là bắt buộc')
-      .email('Email không hợp lệ')
-      .toLowerCase()
-      .trim(),
-  })
+  email: z.string()
+    .min(1, "Vui lòng nhập email")
+    .email("Email không hợp lệ"),
+    
+  password: z.string()
+    .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Mật khẩu cần chữ hoa, chữ thường và số"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Mật khẩu xác nhận không khớp",
+  path: ["confirmPassword"],
+})
 
-export type ForgotPasswordInput = z.infer<ReturnType<typeof getForgotPasswordSchema>>
+export type RegisterFormValues = z.infer<typeof registerSchema>
 
-export const getResetPasswordSchema = () =>
-  z
-    .object({
-      password: z
-        .string()
-        .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
-        .regex(/[A-Z]/, 'Mật khẩu cần ít nhất 1 chữ hoa')
-        .regex(/[0-9]/, 'Mật khẩu cần ít nhất 1 số'),
-      confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: 'Mật khẩu xác nhận không khớp',
-      path: ['confirmPassword'],
-    })
+// --- FORGOT PASSWORD SCHEMA ---
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "Vui lòng nhập email" })
+    .email({ message: "Email không đúng định dạng" }),
+})
 
-export type ResetPasswordInput = z.infer<ReturnType<typeof getResetPasswordSchema>>
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
+
+// --- RESET PASSWORD SCHEMA ---
+export const resetPasswordSchema = z.object({
+  newPassword: z.string()
+    .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Mật khẩu cần chữ hoa, chữ thường và số"),
+  confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Mật khẩu xác nhận không khớp",
+  path: ["confirmPassword"],
+})
+
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>

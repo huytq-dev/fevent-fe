@@ -1,52 +1,123 @@
-import axios from 'axios'
 import axiosInstance from '../../../lib/axios'
-import { LoginRequest, LoginResponse } from '@/features/auth/auth.type'
-import { ResetPasswordInput } from '@/features/auth/auth.schema'
-export const authService = {
-  loginAPI: async (params: LoginRequest) => {
-    console.log('Service params: ', params)
+import { API_ROUTES } from '@/config/apiRoute'
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  ResetPasswordInput,
+  ResetPasswordResponse,
+  LogoutRequest,
+  LogoutResponse,
+  ConfirmEmailResponse,
+} from '@/features/auth/auth.type'
 
+export const authService = {
+  /**
+   * Đăng nhập
+   */
+  loginAPI: async (params: LoginRequest): Promise<LoginResponse> => {
     try {
-      console.log(params)
-      const response = await axiosInstance.post<LoginResponse>('/auth/login', {
+      const response = await axiosInstance.post<LoginResponse>(API_ROUTES.LOGIN, {
         email: params.email,
         password: params.password,
       })
-      console.log('Service Response: ', response)
       return response.data
     } catch (error) {
       throw error
     }
   },
 
-  refreshTokenAPI: async (refreshToken: string) => {
+  /**
+   * Đăng ký
+   */
+  registerAPI: async (params: RegisterRequest): Promise<RegisterResponse> => {
     try {
-      console.log('Show me refreshToken', refreshToken)
-      const response = await axios.post<LoginResponse>(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`,
-        { refreshToken },
+      const response = await axiosInstance.post<RegisterResponse>(API_ROUTES.REGISTER, {
+        name: params.name,
+        username: params.username,
+        email: params.email,
+        password: params.password,
+        studentId: params.studentId,
+        schoolName: params.schoolName,
+      })
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  /**
+   * Đăng xuất
+   */
+  logoutAPI: async (params?: LogoutRequest): Promise<LogoutResponse> => {
+    try {
+      const response = await axiosInstance.post<LogoutResponse>(API_ROUTES.LOGOUT, params || {})
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  /**
+   * Refresh token
+   */
+  refreshTokenAPI: async (): Promise<LoginResponse> => {
+    try {
+      const response = await axiosInstance.post<LoginResponse>(API_ROUTES.REFRESH)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  /**
+   * Quên mật khẩu
+   */
+  forgotPasswordAPI: async (params: ForgotPasswordRequest): Promise<ForgotPasswordResponse> => {
+    try {
+      const response = await axiosInstance.post<ForgotPasswordResponse>(
+        API_ROUTES.FORGOT_PASSWORD,
+        {
+          email: params.email,
+        }
       )
-      console.log('refreshToken Response: ', response)
       return response.data
     } catch (error) {
       throw error
     }
   },
 
-  resetPassword: async (data: ResetPasswordInput) => {
+  /**
+   * Đặt lại mật khẩu
+   */
+  resetPasswordAPI: async (data: ResetPasswordInput): Promise<ResetPasswordResponse> => {
     try {
-      console.log('Show me refreshToken', data)
-      return { success: true }
+      const response = await axiosInstance.post<ResetPasswordResponse>(API_ROUTES.RESET_PASSWORD, {
+        token: data.token,
+        newPassword: data.newPassword,
+        confirmPassword: data.confirmPassword,
+      })
+      return response.data
     } catch (error) {
       throw error
     }
   },
 
-  forgotPassword: async (_params: unknown) => {
+  /**
+   * Xác thực email
+   */
+  confirmEmailAPI: async (token: string): Promise<ConfirmEmailResponse> => {
     try {
-      return { success: true }
-    } catch (_error) {
-      throw _error
+      const response = await axiosInstance.post<ConfirmEmailResponse>(
+        API_ROUTES.CONFIRM_EMAIL,
+        { token }
+      )
+      return response.data
+    } catch (error) {
+      throw error
     }
   },
 }

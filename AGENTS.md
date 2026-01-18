@@ -1,35 +1,109 @@
-# Repository Guidelines
+# Repository Guidelines & Coding Standards
 
-## Project Structure & Module Organization
-- `src/app/`: Next.js App Router routes, layouts, and pages.
-- `src/components/`: shared UI components.
-- `src/features/`: feature-specific modules and flows.
-- `src/hooks/`, `src/utils/`, `src/lib/`: reusable hooks and helpers.
-- `src/config/`, `src/types/`, `src/providers/`, `src/middlewares/`: configuration, shared types, providers, and middleware.
-- `public/`: static assets.
-- Aliases from `tsconfig.json`: `@/components/*`, `@/utils/*`, etc.
+## 1. Project Structure & Module Organization
 
-## Build, Test, and Development Commands
-- `npm run dev`: start the Next.js dev server on `http://localhost:3000`.
-- `npm run build`: create a production build.
-- `npm run start`: run the production server from `.next`.
-- `npm run lint`: run ESLint (Next.js core-web-vitals + TypeScript rules).
+We follow a **Feature-based Architecture**. Code related to a specific domain (e.g., Auth, Event, User) should be grouped together in `src/features/`.
 
-## Coding Style & Naming Conventions
-- Language: TypeScript + React (Next.js App Router).
-- Indentation: 2 spaces (match existing TS/JS configs).
-- Filenames: `kebab-case` for folders, `PascalCase` for React components where used.
-- Prefer absolute imports via aliases (e.g., `@/components/Button`).
-- Linting: ESLint is configured in `eslint.config.mjs`; follow its rules.
+- **`src/app/`**: Next.js App Router (routes, layouts, pages). **Keep logic minimal here**.
+- **`src/features/`**: Feature-specific modules. Structure each feature as:
+  - `src/features/[feature]/components/`: UI components (Forms, Views).
+  - `src/features/[feature]/services/`: API calls (e.g., `AuthService.ts`).
+  - `src/features/[feature]/[feature].schema.ts`: Zod schemas & Types.
+- **`src/components/ui/`**: Shadcn UI components (Do not modify logic, only styles if necessary).
+- **`src/components/common/`**: Shared components used across multiple features.
+- **`src/config/`**: App constants, routes (`ROUTES`), env variables.
+- **`src/lib/`**: Library configurations (axios, utils, etc.).
 
-## Testing Guidelines
-- No test runner is configured in `package.json` yet.
-- If you add tests, document the framework and add a script (e.g., `npm run test`).
+---
 
-## Commit & Pull Request Guidelines
-- Commit messages in history are short, imperative, and lowercase (e.g., "init project", "move app to src folder").
-- PRs should include: clear description, linked issue (if any), and screenshots for UI changes.
+## 2. Tech Stack & Core Libraries
 
-## Configuration & Environment
-- Use `.env` for local environment variables; avoid committing secrets.
-- Next.js config is in `next.config.ts` and TypeScript paths in `tsconfig.json`.
+- **Framework**: Next.js 14+ (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Library**: Shadcn UI (Radix Primitives) + Lucide React (Icons)
+- **Form Management**: React Hook Form + Zod Resolver
+- **Animations**: Framer Motion
+- **Fonts**: Be Vietnam Pro (configured in `layout.tsx`)
+
+---
+
+## 3. Coding Standards & Best Practices
+
+### A. Forms & Validation (Strict)
+
+1.  **Separation of Concerns**: Never define Zod schemas inside the component file.
+    - Create a `[feature].schema.ts` file.
+    - Export both the `schema` and the `Type` (via `z.infer`).
+2.  **Form Components**:
+    - Use `Form`, `FormControl`, `FormField` from Shadcn.
+    - **Input Spacing Fix**: Always wrap `FormControl` and `FormError` inside a `relative div` to prevent layout shifts or spacing issues when errors appear.
+3.  **Password Inputs**:
+    - Hide the browser's default "eye" icon using the class: 
+      ```css
+      [&::-ms-reveal]:hidden [&::-ms-clear]:hidden
+      ```
+
+### B. API & Service Layer
+
+1.  **Service Pattern**: Do not call `axios`/`fetch` directly in UI components.
+    - Create a `[Feature]Service.ts` class (e.g., `AuthService`).
+    - Handle API calls and return processed data.
+2.  **Response Handling**:
+    - Backend standard response format:
+      ```ts
+      { isSuccess: boolean, statusCode: number, message: string, data: T, errors: any }
+      ```
+    - **Frontend Check**: Check `if (response.statusCode === 200)` or `if (response.isSuccess)`. Do NOT rely solely on `try/catch` for logic flow.
+
+### C. UI/UX Patterns
+
+1.  **Shadcn UI First**: Always use Shadcn components (`Card`, `Button`, `Input`).
+    - **Contextual Styling**: If a `Card` is placed inside a Layout that already has borders/shadows, use the following classes to blend in:
+      ```tsx
+      <Card className="border-0 shadow-none bg-transparent">
+      ```
+2.  **Feedback**:
+    - Use `sonner` (`toast.success`, `toast.error`) for notifications.
+    - Use `Loader2` (`animate-spin`) for loading states.
+    - Always disable buttons (`disabled={isLoading}`) during API submissions.
+3.  **Client Components**:
+    - Use `'use client'` at the very top of the file.
+    - **Critical**: If a component uses `useSearchParams`, you **MUST** wrap it in `<Suspense>` in the parent `page.tsx` to avoid de-opting to client-side rendering for the whole route.
+
+---
+
+## 4. Naming Conventions
+
+- **Folders**: `kebab-case` (e.g., `verify-email`, `reset-password`)
+- **Files**: `kebab-case` (e.g., `auth.schema.ts`, `login-form.tsx`)
+- **Components**: `PascalCase` (e.g., `LoginForm`, `VerifyEmailView`)
+- **Functions/Variables**: `camelCase` (e.g., `onSubmit`, `isLoading`)
+- **Interfaces/Types**: `PascalCase` (e.g., `LoginFormValues`, `ApiResponse`)
+
+---
+
+## 5. Build & Development Commands
+
+- `npm run dev`: Start development server on `http://localhost:3000`.
+- `npm run build`: Create a production build.
+- `npm run start`: Run the production server from `.next`.
+- `npm run lint`: Run ESLint checks.
+
+---
+
+## 6. Commit Guidelines
+
+Format: `type(scope): description`
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `refactor`: Code change that neither fixes a bug nor adds a feature
+- `style`: Changes that do not affect the meaning of the code (white-space, formatting, etc)
+- `docs`: Documentation only changes
+
+**Examples:**
+- `feat(auth): add verify email page and service`
+- `fix(ui): hide browser default password eye icon`
+- `refactor(auth): separate login schema to auth.schema.ts`

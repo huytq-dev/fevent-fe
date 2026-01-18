@@ -92,18 +92,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const oldRefreshToken = getRefreshToken()
       if (!oldRefreshToken) throw new Error('No refresh token')
 
-      const { accessToken, refreshToken: newRefreshToken } =
-        await authService.refreshTokenAPI(oldRefreshToken)
+      const response = await authService.refreshTokenAPI()
 
-      if (accessToken) {
+      if (response.isSuccess && response.data?.accessToken) {
+        const accessToken = response.data.accessToken
+        
         saveAuthToken(accessToken)
         const decoded = decodeToken(accessToken)
         if (!decoded) throw new Error('Invalid token format')
         saveUserDataFromToken(decoded)
 
         setUser(parseUserFromToken(accessToken))
-
-        if (newRefreshToken) saveRefreshToken(newRefreshToken)
+        
+        // RefreshToken được gửi qua cookie từ backend, không cần lưu từ response
         return true
       }
       return false
@@ -117,9 +118,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(
     async (credentials: LoginInput, expectedRole?: string) => {
       try {
-        const { accessToken, refreshToken } = await authService.loginAPI(credentials)
-        if (!accessToken) throw new Error('No access token received')
+        const response = await authService.loginAPI(credentials)
+        
+        if (!response.isSuccess || !response.data?.accessToken) {
+          throw new Error(response.message || 'Đăng nhập thất bại')
+        }
 
+        const accessToken = response.data.accessToken
         const currentUser = parseUserFromToken(accessToken)
         if (!currentUser) throw new Error('Invalid token format')
 
@@ -129,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         saveAuthToken(accessToken)
-        if (refreshToken) saveRefreshToken(refreshToken)
+        // RefreshToken được gửi qua cookie từ backend, không cần lưu từ response
 
         const decoded = decodeToken(accessToken)
         if (!decoded) throw new Error('Invalid token format')
