@@ -3,12 +3,19 @@ import {
   getAuthToken,
   getRefreshToken,
   saveAuthToken,
-  saveRefreshToken,
   clearAuthData,
 } from '@/utils/authUtils'
 
+import { API_ROUTES } from '@/config/apiRoute'
+
+// Normalize baseURL: loại bỏ dấu / ở cuối nếu có
+const getBaseURL = () => {
+  const url = process.env.NEXT_PUBLIC_API_URL || ''
+  return url.replace(/\/+$/, '') // Loại bỏ tất cả dấu / ở cuối
+}
+
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL, // ⭐ Backend API URL
+  baseURL: getBaseURL(), // ⭐ Backend API URL từ env
   timeout: 10000,
   withCredentials: true, // 🔒 Gửi cookie cùng request
 })
@@ -47,22 +54,30 @@ axiosInstance.interceptors.response.use(
         }
 
         // Gọi API refresh token
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL
+        const backendUrl = getBaseURL()
         const refreshResponse = await axios.post(
-          `${backendUrl}/auth/refresh-token`,
-          { refreshToken },
-          { timeout: 5000 },
+          `${backendUrl}${API_ROUTES.REFRESH}`,
+          {},
+          { 
+            timeout: 5000,
+            withCredentials: true,
+          },
         )
 
-        const { accessToken, refreshToken: newRefreshToken } = refreshResponse.data
+        // Response là ApiResponse<LoginData>
+        const responseData = refreshResponse.data
+        if (responseData?.isSuccess && responseData?.data?.accessToken) {
+          const accessToken = responseData.data.accessToken
+          
+          // Lưu access token mới (refreshToken được gửi qua cookie từ backend)
+          saveAuthToken(accessToken)
 
-        // Lưu token mới
-        saveAuthToken(accessToken)
-        if (newRefreshToken) saveRefreshToken(newRefreshToken)
-
-        // Retry request cũ với token mới
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`
-        return axiosInstance(originalRequest)
+          // Retry request cũ với token mới
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`
+          return axiosInstance(originalRequest)
+        } else {
+          throw new Error('Invalid refresh token response')
+        }
       } catch (refreshError) {
         // Refresh thất bại → xóa token + redirect login
         clearAuthData()

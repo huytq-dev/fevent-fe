@@ -41,7 +41,7 @@ export default function GlobalError({
 
             <div className="space-y-4">
               <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-                500 - Critical Error
+                500 - Lỗi nghiêm trọng
               </h1>
               <p className="text-xl text-muted-foreground">
                 Hệ thống gặp lỗi nghiêm trọng và không thể tải giao diện chính.
@@ -75,7 +75,7 @@ export default function GlobalError({
           </main>
 
           <footer className="absolute bottom-6 w-full text-center text-xs text-muted-foreground z-10">
-            <p>System Failure Recovery Mode &bull; Fevent FE</p>
+            <p>Chế độ khôi phục lỗi hệ thống &bull; Fevent FE</p>
           </footer>
         </div>
       </body>
