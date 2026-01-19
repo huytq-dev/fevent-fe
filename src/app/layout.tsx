@@ -1,6 +1,6 @@
 import { ThemeProvider } from '@/components/common/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
-// import { AuthProvider } from '@/providers/AuthProvider'
+import { AuthProvider } from '@/providers/AuthProvider'
 import type { Metadata } from 'next'
 import { Be_Vietnam_Pro } from 'next/font/google'
 import './globals.css'
@@ -28,12 +28,12 @@ export default function RootLayout({
         suppressHydrationWarning 
         className={`${beVietnamPro.className} antialiased`}
       >
-        {/* <AuthProvider> */}
+        <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
             {children}
           </ThemeProvider>
           <Toaster />
-        {/* </AuthProvider> */}
+        </AuthProvider>
       </body>
     </html>
   )
