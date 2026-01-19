@@ -28,12 +28,12 @@ export default function RootLayout({
         suppressHydrationWarning 
         className={`${beVietnamPro.className} antialiased`}
       >
-        {/* <AuthProvider> */}
+        <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
             {children}
           </ThemeProvider>
           <Toaster />
-        {/* </AuthProvider> */}
+        </AuthProvider>
       </body>
     </html>
   )
