@@ -32,7 +32,7 @@ export default function AuthLayout({
             priority
             sizes="50vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-black/30" />
         </div>
 
         <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full h-full">
