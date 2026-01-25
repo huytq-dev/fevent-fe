@@ -14,11 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 import { ROUTES } from "@/config/routes";
-import { getUserAvatar, getUserEmail, getUserName, getUserRole, isAuthenticated, getUserId } from "@/utils/authUtils";
 import type { User } from "@/types/auth";
+import { clearAuthData, getUserAvatar, getUserEmail, getUserId, getUserName, getUserRole, isAuthenticated } from "@/utils/authUtils";
 
 const NAV_ITEMS = [
-  { label: "Trang chủ", href: "/" },
+  { label: "Trang chủ", href: "/home" },
   { label: "Tìm sự kiện", href: "/events" },
   { label: "Clubs", href: "/clubs" },
   { label: "Lịch của tôi", href: "/schedule" },
@@ -89,8 +89,7 @@ export function HomeHeader() {
 
   // --- Hàm xử lý Đăng xuất ---
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
+    clearAuthData();
     setUserInfo({
       id: null,
       name: null,
