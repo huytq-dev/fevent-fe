@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Clock, MapPin } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 interface EventCardProps {
   event: {
     id: number
+    slug: string
     title: string
     date: { day: string; month: string }
     time: string
@@ -94,9 +96,11 @@ export function EventCard({ event, isList = false }: EventCardProps) {
           </div>
 
           {/* Title */}
-          <h3 className={`font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-orange-600 transition-colors cursor-pointer 
+          <h3 className={`font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-orange-600 transition-colors 
             ${isList ? 'text-base min-h-0' : 'text-lg min-h-14'}`}>
-            {event.title}
+            <Link href={`/events/${event.slug}`} className="hover:underline focus:outline-none">
+              {event.title}
+            </Link>
           </h3>
         </CardHeader>
 
@@ -119,17 +123,25 @@ export function EventCard({ event, isList = false }: EventCardProps) {
 
         {/* Footer */}
         <CardFooter className={`${isList ? 'p-3 pt-0' : 'p-5 pt-0'} mt-auto`}>
-          <Button
-            disabled={event.status === "CLOSED"}
-            className={`w-full font-bold shadow-sm transition-all 
-              ${isList ? 'h-8 text-xs' : ''} 
-              ${event.status === "CLOSED"
-                ? "bg-gray-100 text-gray-400 hover:bg-gray-100"
-                : "bg-orange-600 hover:bg-orange-700 text-white"
-              }`}
-          >
-            {event.status === "CLOSED" ? "Đã đóng" : "Đăng ký ngay →"}
-          </Button>
+          {event.status === "CLOSED" ? (
+            <Button
+              disabled
+              className={`w-full font-bold shadow-sm transition-all 
+                ${isList ? 'h-8 text-xs' : ''} 
+                bg-gray-100 text-gray-400 hover:bg-gray-100`}
+            >
+              Đã đóng
+            </Button>
+          ) : (
+            <Button
+              asChild
+              className={`w-full font-bold shadow-sm transition-all 
+                ${isList ? 'h-8 text-xs' : ''} 
+                bg-orange-600 hover:bg-orange-700 text-white`}
+            >
+              <Link href={`/events/${event.slug}`}>Đăng ký ngay →</Link>
+            </Button>
+          )}
         </CardFooter>
       </div>
     </Card>

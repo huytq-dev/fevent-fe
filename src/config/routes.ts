@@ -17,4 +17,6 @@ export const ROUTES = {
   // Protected routes
   // Trang chính
   HOME: '/home',
+  PROFILE: '/profile',
+  EVENTS: '/events',
 } as const
