@@ -21,7 +21,7 @@ const NAV_ITEMS = [
   { label: "Trang chủ", href: "/home" },
   { label: "Tìm sự kiện", href: "/events" },
   { label: "Clubs", href: "/clubs" },
-  { label: "Lịch của tôi", href: "/schedule" },
+  { label: "Lịch của tôi", href: "/history" },
 ];
 
 export function HomeHeader() {
@@ -109,7 +109,7 @@ export function HomeHeader() {
 
           {/* LEFT */}
           <div className="flex flex-1 items-center">
-            <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
+            <Link href={ROUTES.HOME} className="flex items-center gap-2 transition-opacity hover:opacity-80">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <CalendarFold className="h-5 w-5" />
               </div>

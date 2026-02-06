@@ -1,10 +1,5 @@
 import axios from 'axios'
-import {
-  getAuthToken,
-  getRefreshToken,
-  saveAuthToken,
-  clearAuthData,
-} from '@/utils/authUtils'
+import { getAuthToken, saveAuthToken, clearAuthData } from '@/utils/authUtils'
 import { API_ROUTES } from '@/config/apiRoute'
 
 // Normalize baseURL: remove trailing slashes.
@@ -50,18 +45,21 @@ const processQueue = (error: unknown, token: string | null) => {
 }
 
 const refreshAccessToken = async () => {
-  const refreshToken = getRefreshToken()
-  if (!refreshToken) {
-    throw new Error('Missing refresh token')
+  const backendUrl = getBaseURL()
+  const accessToken = getAuthToken()
+  const headers: Record<string, string> = {}
+  if (accessToken) {
+    // Backend expects userId from Authorization token (even if expired)
+    headers.Authorization = `Bearer ${accessToken}`
   }
 
-  const backendUrl = getBaseURL()
   const refreshResponse = await axios.post(
     `${backendUrl}${API_ROUTES.REFRESH}`,
     {},
     {
       timeout: 5000,
       withCredentials: true,
+      headers,
     },
   )
 
@@ -76,9 +74,17 @@ const refreshAccessToken = async () => {
   throw new Error('Invalid refresh token response')
 }
 
+const AUTH_LOGOUT_EVENT = 'auth:logout'
+let isRedirectingToLogin = false
+
 const redirectToLogin = () => {
   if (typeof window !== 'undefined') {
-    window.location.href = '/login'
+    if (isRedirectingToLogin || window.location.pathname === '/login') return
+    isRedirectingToLogin = true
+    window.dispatchEvent(new CustomEvent(AUTH_LOGOUT_EVENT))
+    setTimeout(() => {
+      isRedirectingToLogin = false
+    }, 1000)
   }
 }
 
@@ -87,6 +93,11 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
     if (!originalRequest) {
+      return Promise.reject(error)
+    }
+
+    // Avoid refresh loop on refresh endpoint itself
+    if (originalRequest.url?.includes(API_ROUTES.REFRESH)) {
       return Promise.reject(error)
     }
 

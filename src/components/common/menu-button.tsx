@@ -9,10 +9,9 @@ import {
   LogOut,
   User as UserIcon,
   Settings,
-  Loader2,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import Link from 'next/link' // [FIX] Thêm Link
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -27,11 +26,11 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Skeleton } from '@/components/ui/skeleton' // [FIX] Thêm Skeleton
-import type { User } from '@/types/auth' // [FIX] Import Type chuẩn
+import { Skeleton } from '@/components/ui/skeleton'
+import type { User } from '@/types/auth'
 
 interface MenuButtonProps {
-  user?: User | null // [FIX] Type chuẩn
+  user?: User | null
   logout?: () => void
 }
 
@@ -43,7 +42,6 @@ export function MenuButton({ user, logout }: MenuButtonProps) {
     setIsMounted(true)
   }, [])
 
-  // [FIX] Tránh Layout Shift: Hiển thị Skeleton thay vì null
   if (!isMounted) {
     return (
       <Button variant="ghost" size="icon" className="rounded-full ml-1" disabled>
@@ -60,24 +58,28 @@ export function MenuButton({ user, logout }: MenuButtonProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative rounded-full ml-1">
-          {user ? (
+      <div className="flex items-center gap-2">
+        {user && (
+          <Link href="/profile" className="rounded-full" aria-label="Go to profile">
             <Avatar className="h-8 w-8 border cursor-pointer transition-opacity hover:opacity-80">
-              <AvatarImage 
-                src={user.avatarUrl || "https://github.com/shadcn.png"} 
-                alt={user.name || "User"} 
+              <AvatarImage
+                src={user.avatarUrl || 'https://github.com/shadcn.png'}
+                alt={user.name || 'User'}
               />
               <AvatarFallback>
-                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
               </AvatarFallback>
             </Avatar>
-          ) : (
+          </Link>
+        )}
+
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative rounded-full ml-1">
             <EllipsisVertical className="h-5 w-5 text-muted-foreground" />
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      
+          </Button>
+        </DropdownMenuTrigger>
+      </div>
+
       <DropdownMenuContent className="w-56" align="end" forceMount>
         {user && (
           <>
@@ -90,27 +92,24 @@ export function MenuButton({ user, logout }: MenuButtonProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            
+
             <DropdownMenuGroup>
-              {/* [FIX] Thêm Link để điều hướng */}
               <DropdownMenuItem asChild>
                 <Link href="/profile" className="cursor-pointer w-full">
                   <UserIcon className="mr-2 h-4 w-4" />
                   <span>Hồ sơ cá nhân</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
+              {/* <DropdownMenuItem asChild>
                 <Link href="/settings" className="cursor-pointer w-full">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Cài đặt</span>
                 </Link>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
           </>
         )}
 
-        {/* Theme Submenu */}
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <Sun className="mr-2 h-4 w-4" />
@@ -123,8 +122,8 @@ export function MenuButton({ user, logout }: MenuButtonProps) {
                 onClick={() => setTheme(value)}
                 className="cursor-pointer"
               >
-                <Icon className={`mr-2 h-4 w-4 ${theme === value ? "text-orange-500" : ""}`} />
-                <span className={theme === value ? "font-bold" : ""}>{label}</span>
+                <Icon className={`mr-2 h-4 w-4 ${theme === value ? 'text-orange-500' : ''}`} />
+                <span className={theme === value ? 'font-bold' : ''}>{label}</span>
               </DropdownMenuItem>
             ))}
           </DropdownMenuSubContent>

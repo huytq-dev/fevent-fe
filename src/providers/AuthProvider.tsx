@@ -2,7 +2,7 @@
 
 import { ROUTES } from '@/config/routes'
 import type { CustomJwtPayload, User } from '@/types/auth'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation' // [NEW] Thêm usePathname
 import React, {
   createContext,
   ReactNode,
@@ -41,13 +41,14 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 // --- PROVIDER ---
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
+  const pathname = usePathname() // [NEW] Lấy đường dẫn hiện tại
   const [user, setUser] = useState<User | null>(null)
   const [isInitialized, setIsInitialized] = useState(false)
   
+  // Dùng Ref để tránh re-create hàm không cần thiết
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // --- HELPER: Pure function to parse User ---
-  // (Giữ nguyên logic cũ nhưng có thể tối ưu nếu decodeToken trả về đúng type)
+  // --- HELPER: Parse User ---
   const parseUserFromToken = useCallback((token: string | null): User | null => {
     if (!token) return null
     try {
@@ -80,47 +81,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // [FIX 1] Logic Logout an toàn - Chặn vòng lặp redirect
   const logout = useCallback(() => {
     clearTimer()
     clearAuthData()
     setUser(null)
-    router.push(ROUTES.LOGIN)
-    toast.info('Đã đăng xuất')
-  }, [router, clearTimer])
+    
+    // Chỉ redirect nếu KHÔNG PHẢI đang ở trang login
+    // Điều này ngăn chặn việc trang Login gọi logout -> reload lại trang Login -> loop
+    if (pathname !== ROUTES.LOGIN) {
+      router.push(ROUTES.LOGIN)
+      toast.info('Đã đăng xuất')
+    }
+  }, [router, pathname, clearTimer]) // Thêm pathname vào dependency
 
-  // [FIX] Logic Refresh Token thông minh hơn
   const performTokenRefresh = useCallback(async () => {
     try {
-      // Nếu dùng HttpOnly Cookie thì không cần check getRefreshToken() ở đây
-      // Nếu dùng LocalStorage cho RefreshToken thì mới cần check.
-      // Giả sử backend dùng Cookie -> cứ gọi API thử.
-      
       const response = await authService.refreshTokenAPI()
 
       if (response.isSuccess && response.data?.accessToken) {
         const accessToken = response.data.accessToken
-        
         saveAuthToken(accessToken)
         
-        // [FIX] Tối ưu: Decode 1 lần dùng cho cả 2 việc
         const decoded = decodeToken(accessToken)
         if (decoded) {
           saveUserDataFromToken(decoded)
-          // Tái sử dụng decoded data để set User state luôn, đỡ gọi parseUserFromToken lại
-          // (Hoặc gọi lại cũng được, nhưng logic decodeToken ở trên đã an toàn)
           setUser(parseUserFromToken(accessToken)) 
         }
-
         return true
       }
       return false
     } catch (error: any) {
       console.error('Refresh failed:', error)
       
-      // [FIX] QUAN TRỌNG: Chỉ Logout nếu lỗi là 401 (Unauthorized) hoặc 403 (Forbidden)
-      // Nếu lỗi mạng (Network Error) hoặc 500 -> KHÔNG Logout, để user thử lại sau.
       const status = error?.response?.status || error?.status;
-      if (status === 401 || status === 403) {
+      
+      // [FIX 2] Phân biệt 401 và 403
+      // 401: Unauthorized (Token hết hạn/sai) -> BẮT BUỘC Logout
+      if (status === 401) {
+         logout()
+      } 
+      // 403: Forbidden (Token đúng nhưng bị cấm truy cập resource này)
+      // -> KHÔNG logout ngay, vì user vẫn đang login hợp lệ, chỉ là không được quyền làm việc này thôi.
+      // -> Trừ khi API refresh trả về 403 (Refresh token bị blacklist) thì mới logout.
+      else if (status === 403) {
+         // Tùy logic backend, nếu backend trả 403 cho refresh token thì logout.
+         // Nhưng nên cẩn thận log ra để debug.
+         console.warn('Refresh token forbidden')
          logout()
       }
       
@@ -138,21 +145,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         const accessToken = response.data.accessToken
-        
-        // [FIX] Double Decode: Decode 1 lần ở đây
         const decoded = decodeToken(accessToken)
         if (!decoded) throw new Error('Invalid token format')
 
-        // 1. Lưu token
         saveAuthToken(accessToken)
-        // 2. Lưu user info phụ (nếu cần)
         saveUserDataFromToken(decoded)
 
-        // 3. Parse user từ token (Hoặc build object User trực tiếp từ biến decoded ở trên cho nhanh)
         const currentUser = parseUserFromToken(accessToken)
         if (!currentUser) throw new Error('Cannot parse user')
 
-        // 4. Check Role
         const requiredRole = expectedRole?.toLowerCase()
         if (requiredRole && currentUser.role !== requiredRole) {
           throw new Error('Bạn không có quyền truy cập.')
@@ -163,7 +164,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const redirectPath = ROLE_REDIRECTS[currentUser.role || ''] || ROUTES.LOGIN
         router.push(redirectPath)
-      } catch (err) {
+      } catch (err: any) {
+        // Login thất bại thì clean hết
         clearAuthData()
         setUser(null)
         throw err
@@ -180,17 +182,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return
 
     const expiresIn = getTokenExpiresIn()
-    // Nếu token hết hạn hoặc sắp hết hạn (< 2 phút) -> refresh
-    // [Lưu ý] Nếu expiresIn < 0 (đã hết hạn), set delay = 0 để refresh ngay
-    const shouldRefreshImmediately = expiresIn < 2 * 60 * 1000 
-    const delay = shouldRefreshImmediately ? 0 : expiresIn - 2 * 60 * 1000 
+    // Nếu expires < 0 (hết hạn), delay = 0 để gọi ngay
+    const delay = expiresIn < 2 * 60 * 1000 ? 0 : expiresIn - 2 * 60 * 1000 
 
     refreshTimerRef.current = setTimeout(() => {
       performTokenRefresh()
-    }, Math.max(0, delay)) // Đảm bảo delay không âm
+    }, Math.max(0, delay))
 
     return () => clearTimer()
-  }, [user, performTokenRefresh, clearTimer])
+  }, [user, performTokenRefresh, clearTimer]) // user thay đổi thì reset timer
 
   // 2. Initialization
   useEffect(() => {
@@ -202,9 +202,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const expiresIn = getTokenExpiresIn()
+      // [FIX 3] Nếu token chưa hết hạn thì set User luôn, không gọi refresh thừa thãi
       if (expiresIn > 0) {
-        setUser(parseUserFromToken(token))
+        const usr = parseUserFromToken(token)
+        if (usr) {
+            setUser(usr)
+        } else {
+            // Token rác -> clear
+            clearAuthData()
+        }
       } else {
+        // Chỉ refresh khi thực sự hết hạn
         const success = await performTokenRefresh()
         if (!success) {
            clearAuthData()
@@ -213,8 +221,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setIsInitialized(true)
     }
+    
     initAuth()
-  }, [parseUserFromToken, performTokenRefresh])
+  }, []) 
 
   // 3. Sync Tabs
   useEffect(() => {
@@ -223,7 +232,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!e.newValue) {
           setUser(null)
           clearTimer()
-          router.push(ROUTES.LOGIN)
+          // [FIX 4] Check pathname trước khi push ở sự kiện storage
+          if (window.location.pathname !== ROUTES.LOGIN) {
+             router.push(ROUTES.LOGIN)
+          }
         } else {
           setUser(parseUserFromToken(e.newValue))
         }
@@ -231,7 +243,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     window.addEventListener('storage', handleStorageChange)
     return () => window.removeEventListener('storage', handleStorageChange)
-  }, [parseUserFromToken, clearTimer, router])
+  }, [parseUserFromToken, clearTimer, router]) // Bỏ pathname ra khỏi dependency của effect này để tránh re-bind liên tục
+
+  // 4. Listen for global logout event (from axios) to avoid hard reload loops
+  useEffect(() => {
+    const handleAuthLogout = () => {
+      clearTimer()
+      clearAuthData()
+      setUser(null)
+      if (window.location.pathname !== ROUTES.LOGIN) {
+        router.replace(ROUTES.LOGIN)
+      }
+    }
+
+    window.addEventListener('auth:logout', handleAuthLogout)
+    return () => window.removeEventListener('auth:logout', handleAuthLogout)
+  }, [router, clearTimer])
 
   const contextValue = useMemo<AuthContextType>(
     () => ({
