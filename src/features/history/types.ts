@@ -1,7 +1,10 @@
-export type BookingStatus = 'Upcoming' | 'Attended' | 'Missed';
+export type BookingStatus = 'Confirmed' | 'Upcoming' | 'Attended' | 'Missed';
 
 export interface BookingEvent {
-  id: string;
+  registrationId: string;
+  eventId: string;
+  ticketCode?: string;
+  qrCodeUrl?: string;
   title: string;
   location: string;
   timeRange: string;

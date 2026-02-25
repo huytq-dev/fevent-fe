@@ -70,6 +70,7 @@ export function HomeHeader() {
 
     updateUserInfo();
     const handleStorageChange = () => updateUserInfo();
+    const handleAvatarUpdated = () => updateUserInfo();
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         updateUserInfo();
@@ -78,11 +79,13 @@ export function HomeHeader() {
 
     window.addEventListener("storage", handleStorageChange);
     window.addEventListener("focus", updateUserInfo);
+    window.addEventListener("auth:avatar-updated", handleAvatarUpdated);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("focus", updateUserInfo);
+      window.removeEventListener("auth:avatar-updated", handleAvatarUpdated);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
@@ -168,7 +171,8 @@ export function HomeHeader() {
                       id: userInfo.id,
                       name: userInfo.name,
                       email: userInfo.email,
-                      role: userInfo.role
+                      role: userInfo.role,
+                      avatarUrl: userInfo.avatar,
                     } as User : undefined}
                     logout={handleLogout}
                   />

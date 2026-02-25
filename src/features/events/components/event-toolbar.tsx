@@ -8,9 +8,10 @@ import { Grid as GridIcon, List as ListIcon, Search } from "lucide-react"
 interface EventToolbarProps {
   viewMode: "grid" | "list"
   setViewMode: (mode: "grid" | "list") => void
+  totalEvents: number
 }
 
-export function EventToolbar({ viewMode, setViewMode }: EventToolbarProps) {
+export function EventToolbar({ viewMode, setViewMode, totalEvents }: EventToolbarProps) {
   return (
     <div className="bg-white rounded-lg border shadow-sm p-4 flex flex-col sm:flex-row gap-4 justify-between items-center">
       <div className="relative flex-1 w-full sm:max-w-md">
@@ -23,7 +24,7 @@ export function EventToolbar({ viewMode, setViewMode }: EventToolbarProps) {
 
       <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
         <span className="text-sm text-gray-500 hidden md:inline-block">
-          Hiển thị <span className="font-semibold text-gray-900">28</span> sự kiện
+          Hiển thị <span className="font-semibold text-gray-900">{totalEvents}</span> sự kiện
         </span>
 
         <div className="h-8 w-px bg-gray-200 mx-2 hidden sm:block"></div>
