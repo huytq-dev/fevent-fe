@@ -12,9 +12,52 @@ export interface ScheduleItem {
   description?: string
 }
 
+export interface EventSummary {
+  id: string
+  title: string
+  description?: string
+  thumbnailUrl?: string
+  startTime: string
+  endTime: string
+  maxParticipants: number
+  registeredCount: number
+  status: number
+  isPrivate: boolean
+  categoryId: string
+  categoryName: string
+  locationId: string
+  locationName: string
+  organizerId: string
+  clubId?: string
+  createdAt: string
+}
+
+export interface EventDetailResponse {
+  id: string
+  title: string
+  description?: string
+  thumbnailUrl?: string
+  startTime: string
+  endTime: string
+  maxParticipants: number
+  registeredCount: number
+  status: number
+  isPrivate: boolean
+  categoryId: string
+  categoryName: string
+  locationId: string
+  locationName: string
+  locationAddress?: string
+  locationMapUrl?: string
+  organizerId: string
+  organizerName: string
+  organizerAvatarUrl?: string
+  clubId?: string
+  createdAt: string
+}
+
 export interface EventDetail {
-  id: number
-  slug: string
+  id: string
   title: string
   date: string
   timeRange: string

@@ -53,7 +53,7 @@ export function LoginForm() {
       })
 
       if (response.isSuccess && response.statusCode === 200) {
-        toast.success(response.message || 'Đăng nhập thành công')
+        toast.success('Đăng nhập thành công')
         
         const tokenData = response.data
         if (tokenData?.accessToken) {

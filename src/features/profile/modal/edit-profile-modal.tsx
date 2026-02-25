@@ -37,7 +37,9 @@ export function EditProfileModal({ profile, children }: EditProfileModalProps) {
   // Helper convert Date object sang string "YYYY-MM-DD" cho input type="date"
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
-    return new Date(dateString).toISOString().split('T')[0];
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toISOString().split('T')[0];
   };
 
   const {
@@ -72,9 +74,9 @@ export function EditProfileModal({ profile, children }: EditProfileModalProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>Chỉnh sửa hồ sơ</DialogTitle>
           <DialogDescription>
-            Update your personal details.
+            Cập nhật thông tin cá nhân của bạn.
           </DialogDescription>
         </DialogHeader>
 
@@ -82,14 +84,14 @@ export function EditProfileModal({ profile, children }: EditProfileModalProps) {
           
           {/* --- Section 1: Read-Only Info (Identity) --- */}
           <div className="space-y-4 rounded-lg bg-slate-50 p-4 border">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Identity (Read-only)</h3>
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Định danh (Chỉ đọc)</h3>
             <div className="grid grid-cols-2 gap-4">
                <div className="space-y-2">
-                <Label className="text-muted-foreground text-xs">Student ID</Label>
+                <Label className="text-muted-foreground text-xs">Mã sinh viên</Label>
                 <div className="font-medium text-sm">{profile.studentId}</div>
               </div>
               <div className="space-y-2">
-                <Label className="text-muted-foreground text-xs">Email</Label>
+                <Label className="text-muted-foreground text-xs">Email sinh viên</Label>
                 <div className="font-medium text-sm">{profile.email}</div>
               </div>
             </div>
@@ -97,41 +99,41 @@ export function EditProfileModal({ profile, children }: EditProfileModalProps) {
 
           {/* --- Section 2: Basic Info --- */}
           <div className="space-y-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Basic Information</h3>
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Thông tin cơ bản</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2 col-span-2">
-                <Label htmlFor="name">Full Name <span className="text-red-500">*</span></Label>
+                <Label htmlFor="name">Họ tên <span className="text-red-500">*</span></Label>
                 <Input id="name" {...register("name")} />
                 {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">Số điện thoại</Label>
                 <Input id="phone" {...register("phone")} />
                 {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="dob">Date of Birth</Label>
+                <Label htmlFor="dob">Ngày sinh</Label>
                 <Input id="dob" type="date" {...register("dob")} />
                 {errors.dob && <p className="text-red-500 text-xs">{errors.dob.message}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="gender">Gender</Label>
+                <Label htmlFor="gender">Giới tính</Label>
                 <Controller
                   name="gender"
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
+                        <SelectValue placeholder="Chọn giới tính" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Male">Male</SelectItem>
-                        <SelectItem value="Female">Female</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
+                        <SelectItem value="Male">Nam</SelectItem>
+                        <SelectItem value="Female">Nữ</SelectItem>
+                        <SelectItem value="Other">Khác</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -139,13 +141,13 @@ export function EditProfileModal({ profile, children }: EditProfileModalProps) {
               </div>
 
               <div className="space-y-2 col-span-2">
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="address">Địa chỉ</Label>
                 <Textarea 
                   id="address" 
                   className="resize-none" 
                   rows={2} 
                   {...register("address")} 
-                  placeholder="Your current address..."
+                  placeholder="Địa chỉ hiện tại của bạn..."
                 />
               </div>
             </div>
@@ -153,22 +155,22 @@ export function EditProfileModal({ profile, children }: EditProfileModalProps) {
 
           {/* --- Section 3: Socials (CẢNH BÁO: Backend chưa có) --- */}
           <div className="space-y-4 border-t pt-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Social Profiles</h3>
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tài khoản mạng xã hội</h3>
             <div className="space-y-3">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="facebook" className="text-right text-xs">Facebook</Label>
+                <Label htmlFor="facebook" className="text-right text-xs">Facebook <span className="text-red-500">*</span></Label>
                 <Input id="facebook" className="col-span-3 h-8" placeholder="https://facebook.com/..." {...register("facebook")} />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="linkedin" className="text-right text-xs">LinkedIn</Label>
+                <Label htmlFor="linkedin" className="text-right text-xs">LinkedIn <span className="text-red-500">*</span></Label>
                 <Input id="linkedin" className="col-span-3 h-8" placeholder="https://linkedin.com/in/..." {...register("linkedin")} />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="github" className="text-right text-xs">GitHub</Label>
+                <Label htmlFor="github" className="text-right text-xs">GitHub <span className="text-red-500">*</span></Label>
                 <Input id="github" className="col-span-3 h-8" placeholder="https://github.com/..." {...register("github")} />
               </div>
             </div>
-            <p className="text-[10px] text-muted-foreground text-right">*Social links requires backend update</p>
+            <p className="text-[10px] text-muted-foreground text-right">*Liên kết mạng xã hội cần cập nhật backend</p>
           </div>
 
           <DialogFooter>

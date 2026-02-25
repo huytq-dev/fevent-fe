@@ -4,24 +4,51 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Clock, MapPin } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import type { EventSummary } from "../types"
 
 interface EventCardProps {
-  event: {
-    id: number
-    slug: string
-    title: string
-    date: { day: string; month: string }
-    time: string
-    location: string
-    category: string
-    status: string
-    isPopular: boolean
-    image: string
-  }
+  event: EventSummary
   isList?: boolean
 }
 
+const CLOSED_STATUSES = new Set([3, 4, 5])
+const APPROVED_STATUS = 2
+
+const getStatusLabel = (status: number) =>
+  CLOSED_STATUSES.has(status) ? "CLOSED" : "OPEN"
+
+const isFillingFast = (registeredCount: number, maxParticipants: number) => {
+  if (maxParticipants <= 0) return false
+  return registeredCount / maxParticipants >= 0.8
+}
+
+const formatDateBadge = (startTime: string) => {
+  const date = new Date(startTime)
+  const day = date.getDate().toString().padStart(2, "0")
+  const month = date.toLocaleString("en-US", { month: "short" }).toUpperCase()
+  return { day, month }
+}
+
+const formatTimeRange = (startTime: string, endTime: string) => {
+  const start = new Date(startTime).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+  const end = new Date(endTime).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+  return `${start} - ${end}`
+}
+
 export function EventCard({ event, isList = false }: EventCardProps) {
+  const statusLabel = getStatusLabel(event.status)
+  const showFillingFast =
+    event.status === APPROVED_STATUS &&
+    isFillingFast(event.registeredCount, event.maxParticipants)
+  const dateBadge = formatDateBadge(event.startTime)
+  const timeRange = formatTimeRange(event.startTime, event.endTime)
+
   return (
     <Card
       className={`p-0 overflow-hidden border border-gray-100 hover:shadow-lg hover:border-orange-100 transition-all duration-300 bg-white group h-full items-stretch
@@ -35,7 +62,7 @@ export function EventCard({ event, isList = false }: EventCardProps) {
         }`}>
 
         <Image
-          src={event.image}
+          src={event.thumbnailUrl || "https://picsum.photos/seed/fevent/800/600"}
           alt={event.title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
@@ -49,7 +76,7 @@ export function EventCard({ event, isList = false }: EventCardProps) {
         `} />
 
         {/* Badge Popular */}
-        {event.isPopular && (
+        {showFillingFast && (
           <Badge className={`absolute top-2 left-2 bg-orange-100 text-orange-600 hover:bg-orange-100 border border-orange-200 shadow-sm z-10
             ${isList ? 'px-1.5 py-0 text-[10px]' : 'px-2.5 py-0.5'}`}>
             🔥 {isList ? 'Hot' : 'Phổ biến'}
@@ -60,11 +87,11 @@ export function EventCard({ event, isList = false }: EventCardProps) {
         <div className={`absolute bottom-2 right-2 bg-white rounded-lg text-center shadow-md border border-gray-100 z-10 origin-bottom-right
           ${isList ? 'p-1 min-w-[40px] scale-90' : 'p-2 min-w-[56px]'}`}>
           <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none">
-            {event.date.month}
+            {dateBadge.month}
           </span>
           <span className={`block font-extrabold text-gray-900 leading-none mt-0.5 
             ${isList ? 'text-base' : 'text-xl'}`}>
-            {event.date.day}
+            {dateBadge.day}
           </span>
         </div>
       </div>
@@ -79,16 +106,16 @@ export function EventCard({ event, isList = false }: EventCardProps) {
               variant="outline"
               className="text-[10px] uppercase font-bold tracking-wider rounded-sm text-orange-600 border-orange-200 bg-orange-50 px-2 py-0.5"
             >
-              {event.category}
+              {event.categoryName}
             </Badge>
 
-            {event.status === "FILLING FAST" && (
+            {showFillingFast && (
               <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-full animate-pulse">
                 Sắp đầy ⚡
               </span>
             )}
 
-            {event.status === "CLOSED" && (
+            {statusLabel === "CLOSED" && (
               <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                 Đã đóng
               </span>
@@ -98,7 +125,7 @@ export function EventCard({ event, isList = false }: EventCardProps) {
           {/* Title */}
           <h3 className={`font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-orange-600 transition-colors 
             ${isList ? 'text-base min-h-0' : 'text-lg min-h-14'}`}>
-            <Link href={`/events/${event.slug}`} className="hover:underline focus:outline-none">
+            <Link href={`/events/${event.id}`} className="hover:underline focus:outline-none">
               {event.title}
             </Link>
           </h3>
@@ -111,19 +138,19 @@ export function EventCard({ event, isList = false }: EventCardProps) {
 
             <div className="flex items-start text-sm text-gray-500 gap-2.5">
               <Clock className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
-              <span className={isList ? 'text-xs' : 'text-sm'}>{event.time}</span>
+              <span className={isList ? 'text-xs' : 'text-sm'}>{timeRange}</span>
             </div>
 
             <div className="flex items-start text-sm text-gray-500 gap-2.5">
               <MapPin className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
-              <span className={`line-clamp-1 ${isList ? 'text-xs' : 'text-sm'}`}>{event.location}</span>
+              <span className={`line-clamp-1 ${isList ? 'text-xs' : 'text-sm'}`}>{event.locationName}</span>
             </div>
           </div>
         </CardContent>
 
         {/* Footer */}
         <CardFooter className={`${isList ? 'p-3 pt-0' : 'p-5 pt-0'} mt-auto`}>
-          {event.status === "CLOSED" ? (
+          {statusLabel === "CLOSED" ? (
             <Button
               disabled
               className={`w-full font-bold shadow-sm transition-all 
@@ -139,7 +166,7 @@ export function EventCard({ event, isList = false }: EventCardProps) {
                 ${isList ? 'h-8 text-xs' : ''} 
                 bg-orange-600 hover:bg-orange-700 text-white`}
             >
-              <Link href={`/events/${event.slug}`}>Đăng ký ngay →</Link>
+              <Link href={`/events/${event.id}`}>Đăng ký ngay →</Link>
             </Button>
           )}
         </CardFooter>

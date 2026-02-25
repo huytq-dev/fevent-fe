@@ -62,7 +62,7 @@ export function RegisterForm() {
 
       // Logic check response giữ nguyên theo chuẩn cũ của bạn
       if (response.isSuccess && response.statusCode === 200) {
-        toast.success(response.data?.message || response.message || 'Đăng ký thành công')
+        toast.success('Đăng ký thành công')
         setTimeout(() => {
           router.push(ROUTES.LOGIN)
         }, 1500)
@@ -71,10 +71,10 @@ export function RegisterForm() {
           const errorMessages = Object.values(response.errors).flat()
           const errorMessage = errorMessages.join(', ') || response.message || 'Đăng ký thất bại'
           setError(errorMessage)
-          toast.error(errorMessage)
+          toast.error('Đăng ký thất bại')
         } else {
           setError(response.message || 'Đăng ký thất bại')
-          toast.error(response.message || 'Đăng ký thất bại')
+          toast.error('Đăng ký thất bại')
         }
       }
     } catch (err: any) {
@@ -85,7 +85,7 @@ export function RegisterForm() {
         err?.message || 
         'Đăng ký thất bại. Vui lòng thử lại.'
       setError(errorMessage)
-      toast.error(errorMessage)
+      toast.error('Đăng ký thất bại')
     } finally {
       setIsLoading(false)
     }

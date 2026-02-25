@@ -3,8 +3,33 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { EventDetail } from "../../types"
+import { registrationService } from "@/features/registrations/services/RegistrationService"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 export function EventBooking({ event }: { event: EventDetail }) {
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleRegister = async () => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
+    try {
+      const response = await registrationService.register(event.id)
+      if (response?.isSuccess) {
+        toast.success("Đăng ký thành công")
+        router.push("/history")
+      } else {
+        toast.error("Đăng ký thất bại")
+      }
+    } catch (error: any) {
+      toast.error("Đăng ký thất bại")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <Card className="border-none bg-white shadow-lg ring-1 ring-gray-200">
       <CardHeader className="pb-4">
@@ -19,8 +44,10 @@ export function EventBooking({ event }: { event: EventDetail }) {
         <Button
           size="lg"
           className="w-full bg-orange-500 font-semibold text-white hover:bg-orange-600"
+          onClick={handleRegister}
+          disabled={isSubmitting}
         >
-          Register Now
+          {isSubmitting ? "Đang đăng ký..." : "Register Now"}
         </Button>
         <p className="text-center text-xs text-muted-foreground">
           Limited seats available ({event.registeredSeats}/{event.totalSeats})
