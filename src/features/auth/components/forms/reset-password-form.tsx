@@ -69,14 +69,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       })
 
       if (response.isSuccess && response.statusCode === 200) {
-        toast.success(response.data?.message || response.message || "Đặt lại mật khẩu thành công! Vui lòng đăng nhập.")
+        toast.success("Đặt lại mật khẩu thành công! Vui lòng đăng nhập.")
         router.push(ROUTES.LOGIN)
       } else {
-        toast.error(response.message || "Đặt lại mật khẩu thất bại.")
+        toast.error("Đặt lại mật khẩu thất bại.")
       }
     } catch (error: any) {
-      const msg = error?.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại."
-      toast.error(msg)
+      toast.error("Đặt lại mật khẩu thất bại.")
     } finally {
       setIsLoading(false)
     }

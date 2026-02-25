@@ -9,16 +9,16 @@ export function AcademicInfoCard({ profile }: { profile: UserProfile }) {
         <div className="rounded-lg bg-orange-100 p-2">
           <BookOpen className="h-5 w-5 text-orange-600" />
         </div>
-        <CardTitle className="text-lg">Academic Information</CardTitle>
+        <CardTitle className="text-lg">Thông tin học tập</CardTitle>
       </CardHeader>
       <CardContent className="mt-4">
         <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
-          <InfoItem label="Major / Specialization" value={profile.major} isBold />
-          <InfoItem label="University Email" value={profile.email} isBold />
-          <InfoItem label="Current Campus" value={profile.campus} isBold />
-          <InfoItem label="Academic Year" value={profile.academicYear} isBold />
-          <InfoItem label="Date of Birth" value={profile.dob} isBold />
-          <InfoItem label="Phone Number" value={profile.phone} isBold />
+          <InfoItem label="Chuyên ngành" value={profile.major} isBold />
+          <InfoItem label="Email" value={profile.email} isBold />
+          <InfoItem label="Campus" value={profile.campus} isBold />
+          <InfoItem label="Năm học" value={profile.academicYear} isBold />
+          <InfoItem label="Ngày sinh" value={profile.dob} isBold />
+          <InfoItem label="Số điện thoại" value={profile.phone} isBold />
         </div>
       </CardContent>
     </Card>

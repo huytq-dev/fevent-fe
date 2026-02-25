@@ -48,10 +48,10 @@ export function ForgotPasswordForm() {
       if (response.isSuccess && response.statusCode === 200) {
         setSubmittedEmail(data.email)
         setIsSubmitted(true)
-        toast.success(response.data?.message || response.message || 'Email đặt lại mật khẩu đã được gửi')
+        toast.success('Email đặt lại mật khẩu đã được gửi')
       } else {
         setError(response.message || 'Gửi email thất bại')
-        toast.error(response.message || 'Gửi email thất bại')
+        toast.error('Gửi email thất bại')
       }
     } catch (err: any) {
       const errorMessage = 
@@ -59,7 +59,7 @@ export function ForgotPasswordForm() {
         err?.message || 
         'Gửi email thất bại. Vui lòng thử lại.'
       setError(errorMessage)
-      toast.error(errorMessage)
+      toast.error('Gửi email thất bại')
     } finally {
       setIsLoading(false)
     }

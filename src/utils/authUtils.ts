@@ -127,6 +127,17 @@ export const getUserRole = (): string | null =>
 export const getUserAvatar = (): string | null =>
   typeof window === 'undefined' ? null : localStorage.getItem(USER_AVATAR_KEY)
 
+export const setUserAvatar = (avatarUrl: string | null): void => {
+  if (typeof window === 'undefined') return
+  if (!avatarUrl) {
+    localStorage.removeItem(USER_AVATAR_KEY)
+    window.dispatchEvent(new Event('auth:avatar-updated'))
+    return
+  }
+  localStorage.setItem(USER_AVATAR_KEY, avatarUrl)
+  window.dispatchEvent(new Event('auth:avatar-updated'))
+}
+
 export const isTokenValid = (): boolean => {
   const token = getAuthToken()
   if (!token) return false

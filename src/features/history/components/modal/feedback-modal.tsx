@@ -14,11 +14,13 @@ import { Label } from "@/components/ui/label";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
 import { BookingEvent } from "../../types";
 import { feedbackSchema, FeedbackFormValues } from "../../schema";
 import { StarRating } from "../../components/star-rating";
+import { reviewService } from "@/features/history/services/ReviewService";
 
 interface FeedbackModalProps {
   event: BookingEvent;
@@ -60,11 +62,25 @@ export function FeedbackModal({ event, children }: FeedbackModalProps) {
   };
 
   const onSubmit = async (data: FeedbackFormValues) => {
-    console.log("Submit Feedback for event:", event.id, data);
-    // Call API here...
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setOpen(false);
-    reset();
+    try {
+      const payload = {
+        rating: data.overallRating,
+        content: data.comment?.trim() || "",
+      };
+
+      const response = await reviewService.create(event.eventId, payload);
+
+      if (response?.isSuccess) {
+        toast.success("Gửi đánh giá thành công");
+        setOpen(false);
+        reset();
+      } else {
+        toast.error("Gửi đánh giá thất bại");
+      }
+    } catch (error) {
+      console.error("Submit feedback failed:", error);
+      toast.error("Gửi đánh giá thất bại");
+    }
   };
 
   return (

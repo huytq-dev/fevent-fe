@@ -1,8 +1,7 @@
 'use client'
 
-import { Layers } from 'lucide-react'
+import { CalendarFold } from 'lucide-react'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
 
 export default function StatusLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,20 +12,14 @@ export default function StatusLayout({ children }: { children: React.ReactNode }
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
       </div>
 
-      {/* 2. Logo Area */}
+      {/* 2. Logo Area - Giống header */}
       <div className="absolute top-8 left-8 z-10 animate-in fade-in slide-in-from-top-4 duration-700">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div
-            className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-105',
-              'bg-card border border-border shadow-sm',
-            )}
-          >
-            <Layers className="h-6 w-6 text-primary" />
+        <Link href="/" className="flex items-center gap-2 group transition-transform group-hover:scale-105">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <CalendarFold className="h-5 w-5" />
           </div>
           <span className="text-xl font-bold tracking-tight text-foreground">
-            Fevent
-            <span className="font-light text-muted-foreground">FE</span>
+            FEvents
           </span>
         </Link>
       </div>
@@ -35,7 +28,7 @@ export default function StatusLayout({ children }: { children: React.ReactNode }
 
       {/* 4. Footer */}
       <footer className="absolute bottom-6 w-full text-center text-xs text-muted-foreground z-10">
-        <p>© 2026 Fevent FE. All rights reserved.</p>
+        <p>© 2026 FEvents. All rights reserved.</p>
       </footer>
     </div>
   )

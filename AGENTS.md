@@ -28,6 +28,18 @@ We follow a **Feature-based Architecture**. Code related to a specific domain (e
 
 ---
 
+## 2.1 Backend Collaboration Rules (FE ↔ BE)
+
+When wiring new features, follow BE conventions:
+
+- **Controller → Service → Repository** (no business logic in controllers).
+- **DTOs/Responses** live in `Contract`.
+- **Mapster** is used for mapping (prefer mapping profiles in `Application/Mappers`).
+- **DI** via `[RegisterService]` and explicit interfaces in `Application`.
+- FE should call **service layer** only (no direct axios in UI).
+
+---
+
 ## 3. Coding Standards & Best Practices
 
 ### A. Forms & Validation (Strict)

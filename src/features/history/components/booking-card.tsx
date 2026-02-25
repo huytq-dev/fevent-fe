@@ -3,16 +3,32 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CalendarClock, MapPin, MoreVertical, Star, Ticket } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { BookingEvent } from "../types";
 import { FeedbackModal } from "./modal/feedback-modal";
 import { TicketModal } from "./modal/ticket-modal";
+import { CancelModal } from "./modal/cancel-modal";
 
-export function BookingCard({ event }: { event: BookingEvent }) {
+export function BookingCard({
+  event,
+  onCancelled,
+}: {
+  event: BookingEvent;
+  onCancelled?: () => void;
+}) {
   // Logic màu sắc badge
   const statusStyles = {
+    Confirmed: "bg-blue-100 text-blue-600 hover:bg-blue-100",
     Upcoming: "bg-orange-100 text-orange-600 hover:bg-orange-100",
     Attended: "bg-green-100 text-green-600 hover:bg-green-100",
     Missed: "bg-red-100 text-red-600 hover:bg-red-100",
+  };
+
+  const statusLabel = {
+    Confirmed: "Đã xác nhận",
+    Upcoming: "Sắp diễn ra",
+    Attended: "Đã tham gia",
+    Missed: "Đã hủy",
   };
 
   return (
@@ -31,7 +47,7 @@ export function BookingCard({ event }: { event: BookingEvent }) {
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
             <Badge className={`rounded-md border-none ${statusStyles[event.status]}`}>
-              {event.status}
+              {statusLabel[event.status]}
             </Badge>
             <span className="text-xs text-muted-foreground">
               Đặt vé vào {event.registeredAt}
@@ -59,36 +75,42 @@ export function BookingCard({ event }: { event: BookingEvent }) {
 
         {/* 3. Action Buttons (Conditional Rendering) */}
         <div className="pt-2 flex gap-3">
-          {event.status === "Upcoming" && (
+          {(event.status === "Upcoming" || event.status === "Confirmed") && (
             <>
               <TicketModal event={event}>
                 <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6">
-                   <Ticket className="w-4 h-4 mr-2" /> Xem vé
+                  <Ticket className="w-4 h-4 mr-2" /> Xem vé
                 </Button>
               </TicketModal>
-              <Button variant="outline" className="rounded-full px-6 text-gray-600">
-                Hủy đặt vé
-              </Button>
+              <CancelModal registrationId={event.registrationId} onCancelled={onCancelled}>
+                <Button variant="outline" className="rounded-full px-6 text-gray-600">
+                  Hủy đặt vé
+                </Button>
+              </CancelModal>
             </>
           )}
 
+            {event.status === "Missed" && (
+             <TicketModal event={event}>
+                <Button variant="secondary" className="rounded-full px-6 bg-gray-100 text-gray-700">
+                  Xem vé
+                </Button>
+              </TicketModal>
+            )}
+
           {event.status === "Attended" && (
             <>
-              <Button variant="secondary" className="rounded-full px-6 bg-gray-100 text-gray-700 hover:bg-gray-200">
-                Xem chi tiết
-              </Button>
+              <Link href={`/events/${event.eventId}`}>
+                <Button variant="secondary" className="rounded-full px-6 bg-gray-100 text-gray-700 hover:bg-gray-200">
+                  Xem chi tiết
+                </Button>
+              </Link>
               <FeedbackModal event={event}>
                 <Button variant="ghost" className="rounded-full px-4 text-orange-500 hover:text-orange-600 hover:bg-orange-50">
                   <Star className="h-4 w-4 mr-2" /> Đánh giá sự kiện
                 </Button>
               </FeedbackModal>
             </>
-          )}
-
-          {event.status === "Missed" && (
-            <Button variant="secondary" className="rounded-full px-6 bg-gray-100 text-gray-700">
-              Xem chi tiết
-            </Button>
           )}
         </div>
       </div>

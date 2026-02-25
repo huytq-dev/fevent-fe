@@ -8,7 +8,10 @@ export const MOCK_STATS: HistoryStats = {
 
 export const MOCK_BOOKINGS: BookingEvent[] = [
   {
-    id: "1",
+    registrationId: "1",
+    eventId: "event-1",
+    ticketCode: "FEVT-DEMO-0001",
+    qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=FEVT-DEMO-0001",
     title: "AI Workshop: Future of Tech",
     location: "Hall B, FPT University",
     timeRange: "14:00 PM - 16:00 PM",
@@ -18,7 +21,10 @@ export const MOCK_BOOKINGS: BookingEvent[] = [
     thumbnail: "https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=200&auto=format&fit=crop",
   },
   {
-    id: "2",
+    registrationId: "2",
+    eventId: "event-2",
+    ticketCode: "FEVT-DEMO-0002",
+    qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=FEVT-DEMO-0002",
     title: "Student Career Fair 2023",
     location: "Main Auditorium, FPT University",
     timeRange: "09:00 AM - 17:00 PM",
@@ -28,7 +34,10 @@ export const MOCK_BOOKINGS: BookingEvent[] = [
     thumbnail: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=200&auto=format&fit=crop",
   },
   {
-    id: "3",
+    registrationId: "3",
+    eventId: "event-3",
+    ticketCode: "FEVT-DEMO-0003",
+    qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=FEVT-DEMO-0003",
     title: "Intro to Web Development",
     location: "Lab 204, FPT University",
     timeRange: "Completed on Sep 15, 2023",
@@ -38,7 +47,10 @@ export const MOCK_BOOKINGS: BookingEvent[] = [
     thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=200&auto=format&fit=crop",
   },
   {
-    id: "4",
+    registrationId: "4",
+    eventId: "event-4",
+    ticketCode: "FEVT-DEMO-0004",
+    qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=FEVT-DEMO-0004",
     title: "Digital Art Seminar",
     location: "Online (Zoom)",
     timeRange: "Aug 20, 2023 - 10:00 AM",

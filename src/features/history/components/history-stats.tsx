@@ -7,18 +7,18 @@ export function HistoryStatsCards({ stats }: { stats: HistoryStats }) {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <StatItem 
         icon={<Calendar className="h-5 w-5 text-gray-500" />} 
-        label="Total Events" 
+        label="Tổng sự kiện" 
         value={stats.totalEvents} 
       />
       <StatItem 
         icon={<Clock className="h-5 w-5 text-orange-500" />} 
-        label="Upcoming" 
+        label="Sắp diễn ra" 
         value={stats.upcoming} 
         isHighlight 
       />
       <StatItem 
         icon={<RotateCcw className="h-5 w-5 text-gray-500" />} 
-        label="Completed" 
+        label="Đã tham gia" 
         value={stats.completed} 
       />
     </div>
