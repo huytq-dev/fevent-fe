@@ -5,7 +5,7 @@ import { EventFilters } from "@/features/events/components/event-filters"
 import { EventHeader } from "@/features/events/components/event-header"
 import { EventPagination } from "@/features/events/components/event-pagination"
 import { EventToolbar } from "@/features/events/components/event-toolbar"
-import { eventService } from "@/features/events/services/EventService"
+import { eventService } from "@/services/EventService"
 import type { EventSummary } from "@/features/events/types"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
@@ -143,3 +143,4 @@ export default function EventsPage() {
     </div>
   )
 }
+

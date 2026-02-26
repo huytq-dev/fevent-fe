@@ -1,10 +1,29 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Facebook, Github, Linkedin, Share2, ExternalLink } from "lucide-react"
+import { Facebook, Github, Linkedin, Share2, ExternalLink, Globe, Link2 } from "lucide-react"
 import Link from "next/link"
 import type { ReactNode } from "react"
 import type { UserProfile } from "../types"
 
-export function SocialLinksCard({ socials }: { socials: UserProfile["socials"] }) {
+type SocialLink = { platform: number; url: string }
+
+const platformMeta = (platform: number) => {
+  switch (platform) {
+    case 1:
+      return { label: "Facebook", icon: <Facebook className="h-5 w-5 text-blue-600" /> }
+    case 2:
+      return { label: "LinkedIn", icon: <Linkedin className="h-5 w-5 text-blue-700" /> }
+    case 3:
+      return { label: "GitHub", icon: <Github className="h-5 w-5" /> }
+    case 4:
+      return { label: "Website", icon: <Globe className="h-5 w-5 text-emerald-600" /> }
+    default:
+      return { label: "Liên kết", icon: <Link2 className="h-5 w-5 text-gray-600" /> }
+  }
+}
+
+export function SocialLinksCard({ socialLinks }: { socialLinks?: UserProfile["socialLinks"] }) {
+  const links = (socialLinks || []).filter((item): item is SocialLink => !!item?.url)
+
   return (
     <Card className="border-none shadow-sm ring-1 ring-gray-200">
       <CardHeader className="flex flex-row items-center gap-2 pb-2">
@@ -12,27 +31,20 @@ export function SocialLinksCard({ socials }: { socials: UserProfile["socials"] }
         <CardTitle className="text-base">Social Profiles</CardTitle>
       </CardHeader>
       <CardContent className="mt-2 space-y-4">
-        {socials.linkedin && (
-          <SocialItem
-            icon={<Linkedin className="h-5 w-5 text-blue-700" />}
-            label="LinkedIn"
-            url={socials.linkedin}
-          />
+        {links.length === 0 && (
+          <p className="text-sm text-muted-foreground">Chưa có liên kết mạng xã hội.</p>
         )}
-        {socials.github && (
-          <SocialItem
-            icon={<Github className="h-5 w-5" />}
-            label="GitHub"
-            url={socials.github}
-          />
-        )}
-        {socials.facebook && (
-          <SocialItem
-            icon={<Facebook className="h-5 w-5 text-blue-600" />}
-            label="Facebook"
-            url={socials.facebook}
-          />
-        )}
+        {links.map((item, index) => {
+          const meta = platformMeta(item.platform)
+          return (
+            <SocialItem
+              key={`${item.platform}-${index}`}
+              icon={meta.icon}
+              label={meta.label}
+              url={item.url}
+            />
+          )
+        })}
       </CardContent>
     </Card>
   )

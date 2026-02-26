@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { registrationService } from "@/features/registrations/services/RegistrationService";
+import { registrationService } from "@/services/RegistrationService";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -87,3 +87,4 @@ export function CancelModal({ registrationId, children, onCancelled }: CancelMod
     </Dialog>
   );
 }
+

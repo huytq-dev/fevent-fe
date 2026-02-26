@@ -52,11 +52,9 @@ export const withAuth: MiddlewareFactory = (next) => {
           throw new Error('TokenExpired')
         }
 
-        // Logic chặn user đã login truy cập trang Guest (Login/Register)
+        // Logic chặn user đã login truy cập trang Guest (Login/Register/Forgot)
         if (GUEST_ONLY_ROUTES.has(pathname)) {
-            // Chỉ cho phép ở lại trang Login nếu muốn (để logout), còn lại đá về Home
-            if (pathname === ROUTES.LOGIN) return next(request, _next)
-            return NextResponse.redirect(new URL(ROUTES.HOME, request.url))
+          return NextResponse.redirect(new URL(ROUTES.HOME, request.url))
         }
 
         // Kiểm tra quyền (Role) đối với các trang Protected

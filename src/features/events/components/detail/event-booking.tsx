@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { EventDetail } from "../../types"
-import { registrationService } from "@/features/registrations/services/RegistrationService"
+import { registrationService } from "@/services/RegistrationService"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -56,3 +56,4 @@ export function EventBooking({ event }: { event: EventDetail }) {
     </Card>
   )
 }
+

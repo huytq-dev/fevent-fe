@@ -23,7 +23,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert' // D
 import { ROUTES } from '@/config/routes'
 import { FormErrorAnimate } from '@/features/auth/components/shared/form-error-animate'
 import { LoginFormValues, loginSchema } from '@/features/auth/auth.schema'
-import authService from '@/features/auth/services/AuthService'
+import authService from '@/services/AuthService'
 import { saveAuthToken, saveUserDataFromTokenString } from '@/utils/authUtils'
 
 export function LoginForm() {
@@ -188,3 +188,4 @@ export function LoginForm() {
     </Form>
   )
 }
+

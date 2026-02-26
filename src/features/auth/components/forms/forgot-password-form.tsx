@@ -21,7 +21,7 @@ import {
   forgotPasswordSchema,
   ForgotPasswordFormValues,
 } from '@/features/auth/auth.schema'
-import authService from '@/features/auth/services/AuthService'
+import authService from '@/services/AuthService'
 
 export function ForgotPasswordForm() {
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -150,3 +150,4 @@ export function ForgotPasswordForm() {
     </Form>
   )
 }
+

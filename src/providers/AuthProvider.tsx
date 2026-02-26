@@ -16,7 +16,7 @@ import { toast } from 'sonner'
 
 import { ROLE_CLAIM_KEY, ROLE_REDIRECTS } from '@/config/authConfig'
 import { LoginInput } from '@/features/auth/auth.schema'
-import authService from '@/features/auth/services/AuthService'
+import authService from '@/services/AuthService'
 import {
   clearAuthData,
   decodeToken,
@@ -274,3 +274,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
 }
+

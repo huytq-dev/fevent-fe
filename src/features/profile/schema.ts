@@ -3,6 +3,7 @@ import { z } from "zod";
 //  Edit Profile
 export const profileSchema = z.object({
     name: z.string().min(2, "Họ tên phải có ít nhất 2 ký tự"),
+    major: z.string().max(200, "Chuyên ngành không được quá 200 ký tự").optional().or(z.literal("")),
     phone: z.string().regex(/^[0-9]{10,11}$/, "Số điện thoại phải hợp lệ"),
     address: z.string().optional(),
     dob: z.string().optional(),
@@ -13,6 +14,14 @@ export const profileSchema = z.object({
     facebook: z.string().url().optional().or(z.literal("")),
     linkedin: z.string().url().optional().or(z.literal("")),
     github: z.string().url().optional().or(z.literal("")),
+    socialLinks: z
+      .array(
+        z.object({
+          platform: z.number().int(),
+          url: z.string().url("Link không hợp lệ"),
+        }),
+      )
+      .max(3, "Chỉ tối đa 3 liên kết"),
   });
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;

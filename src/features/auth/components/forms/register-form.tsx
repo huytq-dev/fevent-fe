@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/form'
 import { GoogleIcon } from '@/components/icons/google-icon'
 import { registerSchema, RegisterFormValues } from '@/features/auth/auth.schema'
-import authService from '@/features/auth/services/AuthService'
+import authService from '@/services/AuthService'
 import { ROUTES } from '@/config/routes'
 
 export function RegisterForm() {
@@ -276,3 +276,4 @@ export function RegisterForm() {
     </Form>
   )
 }
+
