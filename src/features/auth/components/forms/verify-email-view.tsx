@@ -15,7 +15,7 @@ import {
     CardTitle
 } from '@/components/ui/card'
 import { ROUTES } from '@/config/routes'
-import authService from '@/features/auth/services/AuthService'
+import authService from '@/services/AuthService'
 
 export function VerifyEmailView() {
   const searchParams = useSearchParams()

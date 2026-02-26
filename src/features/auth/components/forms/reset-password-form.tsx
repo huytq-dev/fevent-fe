@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/form'
 import { ROUTES } from '@/config/routes'
 import { resetPasswordSchema, ResetPasswordFormValues } from '@/features/auth/auth.schema'
-import authService from '@/features/auth/services/AuthService'
+import authService from '@/services/AuthService'
 
 // Component hiển thị lỗi animation
 const FormErrorAnimate = ({ message }: { message?: string }) => {
@@ -166,3 +166,4 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     </Form>
   )
 }
+

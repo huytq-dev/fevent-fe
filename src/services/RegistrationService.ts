@@ -1,7 +1,7 @@
 import axiosInstance from '@/lib/axios'
 import { API_ROUTES } from '@/config/apiRoute'
 import type { ApiResponse } from '@/types/api'
-import type { RegistrationDetailResponse, RegistrationSummaryResponse } from '../types'
+import type { RegistrationDetailResponse, RegistrationSummaryResponse } from '@/features/registrations/types'
 
 const normalizeApiPath = (path: string) => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || ''
