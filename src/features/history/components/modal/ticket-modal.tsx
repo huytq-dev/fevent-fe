@@ -12,7 +12,7 @@ import { useContext, useRef, useState } from "react";
 import { toast } from "sonner";
 import { BookingEvent } from "../../types";
 import { AuthContext } from "@/providers/AuthProvider";
-import Image from "next/image"; // Vẫn giữ import nếu bạn dùng Image cho logo sự kiện/QR url
+import { toPng } from "html-to-image"; // <-- Import thư viện mới
 
 interface TicketModalProps {
   event: BookingEvent;
@@ -27,6 +27,9 @@ export function TicketModal({ event, children }: TicketModalProps) {
   const user = auth?.user;
   
   const qrValue = event.ticketCode || event.registrationId;
+  const ownerName = user?.name?.trim() || null;
+  const ownerEmail = user?.email?.trim() || null;
+  const ownerDisplay = ownerName || ownerEmail || "Người dùng";
   const safeTitle = (event.title || "ticket")
     .toLowerCase()
     .replace(/[^a-z0-9]+/gi, "-")
@@ -35,105 +38,27 @@ export function TicketModal({ event, children }: TicketModalProps) {
   const handleSaveImage = async () => {
     if (!ticketRef.current || isSaving) return;
     setIsSaving(true);
-    const nodeStyleMap = new Map<HTMLElement, Partial<CSSStyleDeclaration>>();
+    
     try {
-      const rootNode = ticketRef.current;
-      const docEl = document.documentElement;
-      const body = document.body;
-      const nodes: HTMLElement[] = [
-        docEl,
-        body,
-        rootNode,
-        ...Array.from(rootNode.querySelectorAll<HTMLElement>("*")),
-      ];
-      const hasUnsupported = (value: string) =>
-        value.includes("lab") || value.includes("oklch") || value.includes("color-mix");
-
-      nodes.forEach((node) => {
-        const style = window.getComputedStyle(node);
-        const prev: Partial<CSSStyleDeclaration> = {};
-
-        if (hasUnsupported(style.backgroundColor)) {
-          prev.backgroundColor = node.style.backgroundColor;
-          node.style.backgroundColor = "rgb(255, 255, 255)";
-        }
-        if (hasUnsupported(style.color)) {
-          prev.color = node.style.color;
-          node.style.color = "rgb(0, 0, 0)";
-        }
-        if (hasUnsupported(style.borderColor)) {
-          prev.borderColor = node.style.borderColor;
-          node.style.borderColor = "rgb(229, 231, 235)";
-        }
-        if (hasUnsupported(style.outlineColor)) {
-          prev.outlineColor = node.style.outlineColor;
-          node.style.outlineColor = "rgb(229, 231, 235)";
-        }
-        if (hasUnsupported(style.textDecorationColor)) {
-          prev.textDecorationColor = node.style.textDecorationColor;
-          node.style.textDecorationColor = "rgb(0, 0, 0)";
-        }
-        if (
-          style.backgroundImage &&
-          (style.backgroundImage.includes("gradient") ||
-            style.backgroundImage.includes("color-mix") ||
-            style.backgroundImage.includes("oklch") ||
-            style.backgroundImage.includes("lab"))
-        ) {
-          prev.backgroundImage = node.style.backgroundImage;
-          node.style.backgroundImage = "none";
-        }
-
-        if (Object.keys(prev).length > 0) {
-          nodeStyleMap.set(node, prev);
-        }
-      });
-
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(ticketRef.current, {
-        scale: 2,
+      // Dùng html-to-image gọn gàng và chuẩn xác hơn rất nhiều
+      const dataUrl = await toPng(ticketRef.current, {
+        cacheBust: true,
         backgroundColor: "#ffffff",
-        useCORS: true,
-        logging: false,
-        removeContainer: true,
-        onclone: (doc) => {
-          const root = doc.getElementById("ticket-capture");
-          if (!root) return;
-          root.style.backgroundColor = "#ffffff";
-          doc.documentElement.style.backgroundColor = "#ffffff";
-          doc.body.style.backgroundColor = "#ffffff";
+        pixelRatio: 2, // Giữ độ nét cao (nhân đôi pixel)
+        style: {
+          transform: "scale(1)", // Đảm bảo không bị méo khi chụp
         },
       });
-      const dataUrl = canvas.toDataURL("image/png");
+
       const link = document.createElement("a");
       link.href = dataUrl;
-      link.download = `ve-${safeTitle || "ticket"}.png`;
+      link.download = `ve-${safeTitle}.png`;
       link.click();
       toast.success("Đã lưu ảnh vé");
     } catch (error) {
       console.error("Save ticket image failed:", error);
       toast.error("Lưu ảnh vé thất bại");
     } finally {
-      nodeStyleMap.forEach((prevStyles, node) => {
-        if (prevStyles.backgroundColor !== undefined) {
-          node.style.backgroundColor = prevStyles.backgroundColor;
-        }
-        if (prevStyles.color !== undefined) {
-          node.style.color = prevStyles.color;
-        }
-        if (prevStyles.borderColor !== undefined) {
-          node.style.borderColor = prevStyles.borderColor;
-        }
-        if (prevStyles.outlineColor !== undefined) {
-          node.style.outlineColor = prevStyles.outlineColor;
-        }
-        if (prevStyles.textDecorationColor !== undefined) {
-          node.style.textDecorationColor = prevStyles.textDecorationColor;
-        }
-        if (prevStyles.backgroundImage !== undefined) {
-          node.style.backgroundImage = prevStyles.backgroundImage;
-        }
-      });
       setIsSaving(false);
     }
   };
@@ -142,17 +67,16 @@ export function TicketModal({ event, children }: TicketModalProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       
-      {/* Dialog Content trong suốt để custom giao diện vé */}
       <DialogContent className="max-w-[400px] p-0 bg-transparent border-none shadow-none text-black">
         
         {/* --- TICKET CONTAINER --- */}
         <div
           ref={ticketRef}
           id="ticket-capture"
-          className="bg-white rounded-3xl overflow-hidden shadow-2xl"
+          className="bg-white rounded-3xl overflow-hidden shadow-2xl w-[350px] sm:w-[400px] mx-auto flex flex-col"
         >
           
-          {/* 1. THÔNG TIN TIÊU ĐỀ SỰ KIỆN (Đã bỏ ảnh background) */}
+          {/* 1. THÔNG TIN TIÊU ĐỀ SỰ KIỆN */}
           <div className="p-6 pb-2 text-center bg-white border-b border-gray-100">
              <span className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">
                  Vé tiêu chuẩn
@@ -179,37 +103,49 @@ export function TicketModal({ event, children }: TicketModalProps) {
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                         <MapPin className="w-3 h-3" /> Địa điểm
                     </p>
-                    <p className="font-semibold text-sm line-clamp-2">{event.location}</p>
+                    <p className="font-semibold text-sm wrap-break-words">{event.location}</p>
                 </div>
             </div>
           </div>
 
           {/* --- TEAR-OFF LINE (Đường cắt vé) --- */}
           <div className="relative flex items-center justify-between bg-white">
-             <div className="w-6 h-6 bg-gray-500/50 rounded-full -ml-3" /> {/* Left notch */}
+             <div className="w-6 h-6 bg-gray-500/50 rounded-full -ml-3" />
              <div className="flex-1 border-t-2 border-dashed border-gray-300 mx-2" />
-             <div className="w-6 h-6 bg-gray-500/50 rounded-full -mr-3" /> {/* Right notch */}
+             <div className="w-6 h-6 bg-gray-500/50 rounded-full -mr-3" />
           </div>
 
           {/* 3. QR CODE AREA */}
-           <div className="p-6 bg-white flex flex-col items-center justify-center space-y-4">
-              <div className="p-2 border-2 border-orange-500 rounded-xl">
+           <div className="p-6 bg-white flex flex-col items-center justify-center space-y-4 flex-1">
+              <div className="p-2 border-2 border-orange-500 rounded-xl bg-white flex items-center justify-center">
                   {event.qrCodeUrl ? (
-                    <Image
+                    <img
                       src={event.qrCodeUrl}
                       alt="QR Code"
-                      width={180}
-                      height={180}
+                      width={360}
+                      height={360}
                       crossOrigin="anonymous"
+                      style={{ width: 180, height: 180, display: "block" }}
                     />
                   ) : (
-                    <QRCode 
-                       value={qrValue} 
-                       size={180} 
-                       level="H" 
-                       fgColor="#000000"
-                       bgColor="#FFFFFF"
-                    />
+                    <div
+                      style={{
+                        width: 180,
+                        height: 180,
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <QRCode 
+                         value={qrValue} 
+                         size={360} 
+                         level="H" 
+                         fgColor="#000000"
+                         bgColor="#FFFFFF"
+                         style={{ width: "180px", height: "180px" }}
+                      />
+                    </div>
                   )}
               </div>
               
@@ -225,10 +161,10 @@ export function TicketModal({ event, children }: TicketModalProps) {
               <div className="text-center bg-gray-50 w-full py-2 rounded-lg">
                   <p className="text-xs text-gray-500">Người sở hữu</p>
                   <p className="font-bold text-sm">
-                    {user?.name || "Người dùng"}
-                    {user?.email ? (
+                    {ownerDisplay}
+                    {ownerName && ownerEmail ? (
                       <>
-                        {" "}<span className="text-gray-400">|</span>{" "}{user.email}
+                        {" "}<span className="text-gray-400">|</span>{" "}{ownerEmail}
                       </>
                     ) : null}
                   </p>
@@ -236,18 +172,18 @@ export function TicketModal({ event, children }: TicketModalProps) {
           </div>
 
           {/* 4. FOOTER ACTIONS */}
-          <div
-            className="bg-gray-50 p-4 grid grid-cols-1 gap-3 border-t"
-            data-html2canvas-ignore="true"
-          >
+          {/* Vùng này sẽ không xuất hiện trong ảnh được tải về */}
+          <div className="bg-gray-50 p-4 grid grid-cols-1 gap-3 border-t">
               <Button
                 className="w-full bg-orange-500 hover:bg-orange-600 text-xs h-9"
                 onClick={handleSaveImage}
                 disabled={isSaving}
+                data-html2canvas-ignore="true" // Cho html2canvas nếu bạn vẫn dùng
+                style={{ visibility: isSaving ? "hidden" : "visible" }} // Mẹo nhỏ để ẩn nút khi dùng html-to-image
               >
                   {isSaving ? (
                     <>
-                      <Loader2 className="w-3 h-3 mr-2 animate-spin" /> Đang lưu...
+                      <Loader2 className="w-3 h-3 mr-2 animate-spin" /> Đang xử lý...
                     </>
                   ) : (
                     <>
