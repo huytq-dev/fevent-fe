@@ -7,7 +7,7 @@ import { Calendar as CalendarIcon, Download, Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BookingCard } from "@/features/history/components/booking-card";
 import { HistoryStatsCards } from "@/features/history/components/history-stats";
-import { registrationService } from "@/features/registrations/services/RegistrationService";
+import { registrationService } from "@/services/RegistrationService";
 import type { BookingEvent, BookingStatus, HistoryStats } from "@/features/history/types";
 
 export default function HistoryPage() {
@@ -193,3 +193,4 @@ export default function HistoryPage() {
     </div>
   );
 }
+

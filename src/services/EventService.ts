@@ -1,7 +1,7 @@
 import axiosInstance from "@/lib/axios"
 import { API_ROUTES } from "@/config/apiRoute"
 import type { ApiResponse } from "@/types/api"
-import type { EventDetailResponse, EventSummary } from "../types"
+import type { EventDetailResponse, EventSummary } from "@/features/events/types"
 
 type PagedResult<T> = {
   items: T[]

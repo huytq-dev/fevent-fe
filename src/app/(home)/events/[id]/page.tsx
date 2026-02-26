@@ -5,7 +5,7 @@ import { EventInfo } from "@/features/events/components/detail/event-info"
 import { EventSchedule } from "@/features/events/components/detail/event-schedule"
 import { EventSidebar } from "@/features/events/components/detail/event-sidebar"
 import { EventSpeakers } from "@/features/events/components/detail/event-speakers"
-import { eventService } from "@/features/events/services/EventService"
+import { eventService } from "@/services/EventService"
 import type { EventDetail, EventDetailResponse } from "@/features/events/types"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -128,3 +128,4 @@ export default function EventDetailPage() {
     </div>
   )
 }
+

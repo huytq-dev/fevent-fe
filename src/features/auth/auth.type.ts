@@ -88,6 +88,18 @@ export interface ResetPasswordData {
 
 export type ResetPasswordResponse = ApiResponse<ResetPasswordData>
 
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
+export interface ChangePasswordData {
+  message: string
+}
+
+export type ChangePasswordResponse = ApiResponse<ChangePasswordData>
+
 
 // --- LOGOUT ---
 export interface LogoutRequest {

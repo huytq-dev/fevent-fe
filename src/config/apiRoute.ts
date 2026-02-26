@@ -7,6 +7,7 @@ export const API_ROUTES = {
     CONFIRM_EMAIL: '/api/confirm-email',
     FORGOT_PASSWORD: '/api/forgot-password',
     RESET_PASSWORD: '/api/reset-password',
+    CHANGE_PASSWORD: '/api/change-password',
     EVENTS: '/api/events',
     REGISTRATIONS: '/api/registrations',
     USERS: '/api/users'

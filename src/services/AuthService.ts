@@ -1,4 +1,4 @@
-import axiosInstance from '../../../lib/axios'
+import axiosInstance from '@/lib/axios'
 import { API_ROUTES } from '@/config/apiRoute'
 import {
   LoginRequest,
@@ -9,6 +9,8 @@ import {
   ForgotPasswordResponse,
   ResetPasswordInput,
   ResetPasswordResponse,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
   LogoutRequest,
   LogoutResponse,
   ConfirmEmailResponse,
@@ -97,6 +99,22 @@ export const authService = {
     try {
       const response = await axiosInstance.post<ResetPasswordResponse>(API_ROUTES.RESET_PASSWORD, {
         token: data.token,
+        newPassword: data.newPassword,
+        confirmPassword: data.confirmPassword,
+      })
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  /**
+   * Đổi mật khẩu (yêu cầu đăng nhập)
+   */
+  changePasswordAPI: async (data: ChangePasswordRequest): Promise<ChangePasswordResponse> => {
+    try {
+      const response = await axiosInstance.post<ChangePasswordResponse>(API_ROUTES.CHANGE_PASSWORD, {
+        currentPassword: data.currentPassword,
         newPassword: data.newPassword,
         confirmPassword: data.confirmPassword,
       })

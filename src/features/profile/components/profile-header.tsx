@@ -4,7 +4,8 @@ import { useRef, useState, type ChangeEvent } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { userService } from "@/features/profile/services/UserService"
+import { userService } from "@/services/UserService"
+import type { UserProfileResponse } from "@/features/profile/types"
 import { ChangePasswordModal } from "@/features/profile/modal/change-password-modal"
 import { EditProfileModal } from "@/features/profile/modal/edit-profile-modal"
 import { setUserAvatar } from "@/utils/authUtils"
@@ -15,9 +16,10 @@ import type { UserProfile } from "../types"
 type ProfileHeaderProps = {
   profile: UserProfile
   onAvatarUpdated?: (avatarUrl: string) => void
+  onProfileUpdated?: (data: UserProfileResponse) => void
 }
 
-export function ProfileHeader({ profile, onAvatarUpdated }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, onAvatarUpdated, onProfileUpdated }: ProfileHeaderProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
@@ -116,7 +118,7 @@ export function ProfileHeader({ profile, onAvatarUpdated }: ProfileHeaderProps) 
         </div>
 
         <div className="mx-auto flex max-w-lg justify-center gap-4 border-t pt-6">
-          <EditProfileModal profile={profile}>
+          <EditProfileModal profile={profile} onProfileUpdated={onProfileUpdated}>
             <Button
               type="button"
               className="rounded-full bg-orange-500 px-8 hover:bg-orange-600">
@@ -137,3 +139,4 @@ export function ProfileHeader({ profile, onAvatarUpdated }: ProfileHeaderProps) 
     </div>
   )
 }
+

@@ -20,7 +20,7 @@ import Image from "next/image";
 import { BookingEvent } from "../../types";
 import { feedbackSchema, FeedbackFormValues } from "../../schema";
 import { StarRating } from "../../components/star-rating";
-import { reviewService } from "@/features/history/services/ReviewService";
+import { reviewService } from "@/services/ReviewService";
 
 interface FeedbackModalProps {
   event: BookingEvent;
@@ -225,3 +225,4 @@ export function FeedbackModal({ event, children }: FeedbackModalProps) {
     </Dialog>
   );
 }
+
