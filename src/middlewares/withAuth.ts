@@ -19,7 +19,7 @@ const GUEST_ONLY_ROUTES = new Set<string>([
 // --- HELPERS ---
 const getUserRole = (payload: JWTPayload): string => {
   const role = (payload[MICROSOFT_ROLE_CLAIM] as string) || (payload.role as string) || ''
-  return role
+  return role.toLowerCase()
 }
 
 const redirectToLogin = (request: NextRequest) => {
