@@ -12,12 +12,14 @@ const createConfig = (roles: readonly UserRole[]): PermissionConfig => ({
 // Define các nhóm quyền
 const GROUPS = {
   ALL: [ROLES.ADMIN, ROLES.PARTICIPANT, ROLES.ORGANIZER] as const,
+  ORGANIZER: [ROLES.ADMIN, ROLES.ORGANIZER] as const,
 }
 
 export const PERMISSION_MAP: Record<string, PermissionConfig> = {
   // --- PROTECTED ROUTES ---
   // Add protected routes here; routes not listed are treated as public.
-  [ROUTES.HOME]: createConfig(GROUPS.ALL)
+  [ROUTES.HOME]: createConfig(GROUPS.ALL),
+  [ROUTES.ORGANIZER_DASHBOARD]: createConfig(GROUPS.ORGANIZER),
 }
 
 // Pre-compute keys sort by length desc

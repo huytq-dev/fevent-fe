@@ -9,6 +9,7 @@ import {
   LogOut,
   User as UserIcon,
   Settings,
+  LayoutDashboard,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -28,6 +29,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { User } from '@/types/auth'
+import { ROUTES } from '@/config/routes'
 
 interface MenuButtonProps {
   user?: User | null
@@ -100,6 +102,14 @@ export function MenuButton({ user, logout }: MenuButtonProps) {
                   <span>Hồ sơ cá nhân</span>
                 </Link>
               </DropdownMenuItem>
+              {(user.role === "organizer" || user.role === "admin") && (
+                <DropdownMenuItem asChild>
+                  <Link href={ROUTES.ORGANIZER_DASHBOARD} className="cursor-pointer w-full">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Organizer Console</span>
+                  </Link>
+                </DropdownMenuItem>
+              )}
               {/* <DropdownMenuItem asChild>
                 <Link href="/settings" className="cursor-pointer w-full">
                   <Settings className="mr-2 h-4 w-4" />
