@@ -19,4 +19,11 @@ export const ROUTES = {
   HOME: '/home',
   PROFILE: '/profile',
   EVENTS: '/events',
+
+  // Organizer routes
+  ORGANIZER_DASHBOARD: '/organizer',
+  ORGANIZER_EVENTS: '/organizer/events',
+  ORGANIZER_CREATE_EVENT: '/organizer/events/new',
+  ORGANIZER_CHECK_IN: '/organizer/check-in',
+  ORGANIZER_PARTICIPANTS: '/organizer/participants',
 } as const

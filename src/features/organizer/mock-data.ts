@@ -1,0 +1,115 @@
+import type { OrganizerEvent, OrganizerParticipant, OrganizerStats } from "./types"
+
+export const ORGANIZER_EVENTS: OrganizerEvent[] = [
+  {
+    id: "evt-1024",
+    title: "Tech Meetup: AI & Product",
+    category: "Công nghệ",
+    location: "FPT Hall - HCM",
+    startTime: "2026-03-05T08:30:00.000Z",
+    endTime: "2026-03-05T11:30:00.000Z",
+    status: "published",
+    capacity: 200,
+    registeredCount: 142,
+    coverUrl: "https://picsum.photos/seed/organizer-ai/600/400",
+  },
+  {
+    id: "evt-1025",
+    title: "Design Sprint Workshop",
+    category: "Thiết kế",
+    location: "Innovation Lab - DN",
+    startTime: "2026-03-10T09:00:00.000Z",
+    endTime: "2026-03-10T12:00:00.000Z",
+    status: "draft",
+    capacity: 80,
+    registeredCount: 0,
+    coverUrl: "https://picsum.photos/seed/organizer-design/600/400",
+  },
+  {
+    id: "evt-1026",
+    title: "Career Fair 2026",
+    category: "Hướng nghiệp",
+    location: "FPT Arena - HN",
+    startTime: "2026-03-18T02:00:00.000Z",
+    endTime: "2026-03-18T08:00:00.000Z",
+    status: "published",
+    capacity: 500,
+    registeredCount: 388,
+    coverUrl: "https://picsum.photos/seed/organizer-career/600/400",
+  },
+  {
+    id: "evt-1027",
+    title: "Open Mic Night",
+    category: "Âm nhạc",
+    location: "FPT Campus - CT",
+    startTime: "2026-02-20T12:30:00.000Z",
+    endTime: "2026-02-20T15:30:00.000Z",
+    status: "ended",
+    capacity: 150,
+    registeredCount: 150,
+    coverUrl: "https://picsum.photos/seed/organizer-music/600/400",
+  },
+]
+
+export const ORGANIZER_PARTICIPANTS: OrganizerParticipant[] = [
+  {
+    id: "p-1001",
+    name: "Nguyễn Minh Anh",
+    email: "minhanh@fpt.edu.vn",
+    phone: "0901 234 567",
+    ticketCode: "FEV-2026-0001",
+    registeredAt: "2026-02-10T03:15:00.000Z",
+    checkedInAt: "2026-02-20T12:40:00.000Z",
+    status: "checked-in",
+  },
+  {
+    id: "p-1002",
+    name: "Trần Gia Huy",
+    email: "giahuy@fpt.edu.vn",
+    phone: "0909 808 707",
+    ticketCode: "FEV-2026-0002",
+    registeredAt: "2026-02-11T09:20:00.000Z",
+    checkedInAt: null,
+    status: "pending",
+  },
+  {
+    id: "p-1003",
+    name: "Lê Phương Linh",
+    email: "linh.le@fpt.edu.vn",
+    phone: "0933 401 922",
+    ticketCode: "FEV-2026-0003",
+    registeredAt: "2026-02-12T07:05:00.000Z",
+    checkedInAt: "2026-02-20T12:55:00.000Z",
+    status: "checked-in",
+  },
+  {
+    id: "p-1004",
+    name: "Phạm Quốc Bảo",
+    email: "bao.pham@fpt.edu.vn",
+    phone: "0988 212 121",
+    ticketCode: "FEV-2026-0004",
+    registeredAt: "2026-02-13T12:00:00.000Z",
+    checkedInAt: null,
+    status: "cancelled",
+  },
+  {
+    id: "p-1005",
+    name: "Đỗ Thu Hà",
+    email: "thuha@fpt.edu.vn",
+    phone: "0912 112 212",
+    ticketCode: "FEV-2026-0005",
+    registeredAt: "2026-02-14T02:10:00.000Z",
+    checkedInAt: null,
+    status: "pending",
+  },
+]
+
+export const ORGANIZER_STATS: OrganizerStats = {
+  totalEvents: 12,
+  activeEvents: 4,
+  totalParticipants: 1234,
+  checkInRate: 0.78,
+}
+
+export const getOrganizerEventById = (id: string) =>
+  ORGANIZER_EVENTS.find((event) => event.id === id) ?? ORGANIZER_EVENTS[0]
