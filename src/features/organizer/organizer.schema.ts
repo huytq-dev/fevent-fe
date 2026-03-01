@@ -9,7 +9,7 @@ export const organizerEventSchema = z.object({
   endDate: z.string().min(1, "Chọn ngày kết thúc"),
   endTime: z.string().min(1, "Chọn giờ kết thúc"),
   capacity: z
-    .number({ invalid_type_error: "Số lượng phải là số" })
+    .number({ error: "Số lượng phải là số" })
     .min(1, "Số lượng tối thiểu là 1")
     .max(10000, "Số lượng tối đa là 10.000"),
   description: z.string().min(10, "Mô tả cần ít nhất 10 ký tự"),
